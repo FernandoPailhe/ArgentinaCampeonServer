@@ -1,0 +1,1 @@
+rootProject.name = "com.ferpa.machine-stock"
