@@ -1,5 +1,8 @@
 package com.ferpa.di
 
+import com.ferpa.data.app_info.AppInfoController
+import com.ferpa.data.app_info.AppInfoDataSource
+import com.ferpa.data.app_info.AppInfoDataSourceImpl
 import com.ferpa.data.matches.MatchDataSource
 import com.ferpa.data.matches.MatchDataSourceImpl
 import com.ferpa.data.matches.MatchesController
@@ -15,7 +18,7 @@ import com.ferpa.data.photos.PhotosController
 import com.ferpa.data.players.PlayerDataSource
 import com.ferpa.data.players.PlayerDataSourceImpl
 import com.ferpa.data.players.PlayersController
-import com.ferpa.data.tags.TagController
+import com.ferpa.data.tags.TagsController
 import com.ferpa.data.tags.TagDataSource
 import com.ferpa.data.tags.TagDataSourceImpl
 import com.ferpa.utils.Constants
@@ -48,6 +51,9 @@ val mainModule = module {
     single<MomentDataSource> {
         MomentDataSourceImpl(get())
     }
+    single<AppInfoDataSource> {
+        AppInfoDataSourceImpl(get())
+    }
     single {
         PhotosController(get())
     }
@@ -64,7 +70,10 @@ val mainModule = module {
         MomentsController(get())
     }
     single {
-        TagController(get())
+        TagsController(get())
+    }
+    single {
+        AppInfoController(get())
     }
 
 }

@@ -2,7 +2,7 @@ package com.ferpa.data.tags
 
 import com.ferpa.data.model.Tag
 
-class TagController(
+class TagsController(
     private val dataSource: TagDataSource,
 ) {
 
