@@ -1,17 +1,14 @@
 package com.ferpa.routes
 
 
-import com.ferpa.data.matches.MatchesController
-import com.ferpa.data.moments.MomentsController
-import com.ferpa.data.photographer.PhotographersController
 import com.ferpa.data.photos.PhotosController
-import com.ferpa.data.players.PlayersController
 import com.ferpa.utils.Constants.DELETE_KEY
 import com.ferpa.utils.Constants.MATCH_BASE_ROUTE
 import com.ferpa.utils.Constants.MOMENT_BASE_ROUTE
 import com.ferpa.utils.Constants.PHOTOGRAPHER_BASE_ROUTE
 import com.ferpa.utils.Constants.PHOTO_BASE_ROUTE
 import com.ferpa.utils.Constants.PLAYER_BASE_ROUTE
+import com.ferpa.utils.Constants.TAG_BASE_ROUTE
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.request.*
@@ -104,7 +101,7 @@ fun Route.photosByMatch(
 fun Route.photosByTag(
     photosController: PhotosController,
 ) {
-    get("${PHOTO_BASE_ROUTE}/tag/{tag}") {
+    get("${PHOTO_BASE_ROUTE}${TAG_BASE_ROUTE}/{tag}") {
         val tag = call.parameters["tag"] ?: ""
         call.respond(
             HttpStatusCode.OK,

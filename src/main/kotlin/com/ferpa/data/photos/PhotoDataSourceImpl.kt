@@ -51,8 +51,8 @@ class PhotoDataSourceImpl(
             .toList()
     }
 
-    override suspend fun getPhotosByTag(tag: String): List<Photo> {
-        return collection.find(Photo::tags contains tag)
+    override suspend fun getPhotosByTag(tagId: String): List<Photo> {
+        return collection.find(Photo::tags /Tag::id eq tagId)
             .descendingSort(Photo::rank)
             .toList()
     }

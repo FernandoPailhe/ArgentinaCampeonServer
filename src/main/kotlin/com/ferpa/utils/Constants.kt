@@ -11,6 +11,7 @@ object Constants {
     const val MOMENT_BASE_ROUTE = "/moments"
     const val PHOTO_BASE_ROUTE = "/photos"
     const val PHOTOGRAPHER_BASE_ROUTE = "/photographers"
+    const val TAG_BASE_ROUTE = "/tags"
 
     const val DELETE_KEY = "hdsjdwueuei12312478189273aiosjiud87q2730u"
     const val POST_KEY = "4672hd2478189sjdwueuei1231273aiosjiud87q2730u"
