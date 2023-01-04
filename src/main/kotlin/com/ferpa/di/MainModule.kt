@@ -15,6 +15,9 @@ import com.ferpa.data.photos.PhotosController
 import com.ferpa.data.players.PlayerDataSource
 import com.ferpa.data.players.PlayerDataSourceImpl
 import com.ferpa.data.players.PlayersController
+import com.ferpa.data.tags.TagController
+import com.ferpa.data.tags.TagDataSource
+import com.ferpa.data.tags.TagDataSourceImpl
 import com.ferpa.utils.Constants
 import org.koin.dsl.module
 import org.litote.kmongo.coroutine.coroutine
@@ -39,6 +42,9 @@ val mainModule = module {
     single<PhotographerDataSource> {
         PhotographerDataSourceImpl(get())
     }
+    single<TagDataSource> {
+        TagDataSourceImpl(get())
+    }
     single<MomentDataSource> {
         MomentDataSourceImpl(get())
     }
@@ -56,6 +62,9 @@ val mainModule = module {
     }
     single {
         MomentsController(get())
+    }
+    single {
+        TagController(get())
     }
 
 }

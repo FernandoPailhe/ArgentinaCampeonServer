@@ -20,7 +20,7 @@ data class Photo(
     val match: MatchTitle? = null,
     val players: List<PlayerTitle?>? = emptyList(),
     val photographer: PhotographerTitle? = null,
-    val tags: List<String?>? = emptyList(),
+    val tags: List<Tag?>? = emptyList(),
     val votes: Long = 18,
     val versus: Long = 20,
     val rank: Double? = 0.66,
@@ -28,9 +28,8 @@ data class Photo(
     val description: String? = "",
     val photoType: String? = "",
     val moment: MomentTitle? = null,
+    val rarity: Int? = 0
 )
-
-fun Photo.addUUID(): Photo = this.copy(id = UUID.randomUUID().toString())
 
 fun Photo.newPhoto(): Photo = this.copy(
     id = UUID.randomUUID().toString(),
@@ -40,54 +39,6 @@ fun Photo.newPhoto(): Photo = this.copy(
 )
 
 fun Photo.updatePhoto(oldPhoto: Photo): Photo = this.copy(lastUpdate = LocalDateTime.now().toString(), votes = oldPhoto.votes, versus = oldPhoto.versus, rank = oldPhoto.rank, votesUpdate = oldPhoto.votesUpdate)
-
-fun Photo.toPhotoTitle(
-    playersTitle: List<PlayerTitle?>?,
-    matchTitle: MatchTitle?,
-    photographerTitle: PhotographerTitle?,
-    momentTitle: MomentTitle?,
-): PhotoTitle {
-    return PhotoTitle(
-        id = this.id,
-        insertDate = this.insertDate,
-        lastUpdate = this.lastUpdate,
-        votesUpdate = this.votesUpdate,
-        photoUrl = this.photoUrl,
-        match = matchTitle,
-        players = playersTitle,
-        photographer = photographerTitle,
-        tags = this.tags,
-        rank = this.rank,
-        description = this.description,
-        photoType = this.photoType,
-        moment = momentTitle
-    )
-}
-
-suspend fun Photo.toOnePhotoTitle(
-    playersController: PlayersController,
-    matchesController: MatchesController,
-    photographersController: PhotographersController,
-): PhotoTitle {
-    /*
-    val playersTitle = this.players?.filterNotNull()?.map { playerId ->
-        playersController.getPlayerById(playerId)?.toPlayerTitle()
-    }
-    val matchTitle = if (this.matchTitle.isNullOrEmpty()) {
-        null
-    } else {
-        matchesController.getMatchById(this.matchTitle)?.toMatchTitle()
-    }
-    val photographerTitle = if (this.photographerTitle.isNullOrEmpty()) {
-        null
-    } else {
-        photographersController.getPhotographerById(this.photographerTitle)?.toPhotographerTitle()
-    }
-
-     */
-    return this.toPhotoTitle(null, null, null, null)
-}
-
 
 fun Photo.voteWin(superVote: Boolean = false): Photo {
     val votes = if (superVote) this.votes + SUPER_VOTE_AMOUNT else this.votes.inc()

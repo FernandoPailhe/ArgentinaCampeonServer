@@ -5,6 +5,7 @@ import com.ferpa.data.moments.MomentsController
 import com.ferpa.data.photographer.PhotographersController
 import com.ferpa.data.photos.PhotosController
 import com.ferpa.data.players.PlayersController
+import com.ferpa.data.tags.TagController
 import com.ferpa.routes.*
 import io.ktor.routing.*
 import io.ktor.application.*
@@ -18,6 +19,7 @@ fun Application.configureRouting() {
     val matchesController by inject<MatchesController>()
     val photographersController by inject<PhotographersController>()
     val momentsController by inject<MomentsController>()
+    val tagController by inject<TagController>()
     install(Routing){
         getLastUpdatesDates(photosController)
         getNewPhotos(photosController)
@@ -60,6 +62,12 @@ fun Application.configureRouting() {
         momentById(momentsController)
         updateMoment(momentsController)
         deleteMoment(momentsController)
+        // Tag routes
+        tags(tagController)
+        newTag(tagController)
+        updateTag(tagController)
+        tagById(tagController)
+        deleteTag(tagController)
     }
 
     routing {
