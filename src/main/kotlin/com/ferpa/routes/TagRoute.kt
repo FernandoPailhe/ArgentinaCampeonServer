@@ -1,6 +1,7 @@
 package com.ferpa.routes
 
 
+import com.ferpa.data.photos.PhotosController
 import com.ferpa.data.tags.TagsController
 import com.ferpa.utils.Constants
 import com.ferpa.utils.Constants.TAG_BASE_ROUTE
@@ -40,9 +41,9 @@ fun Route.newTag(controller: TagsController) {
     }
 }
 
-fun Route.updateTag(controller: TagsController) {
+fun Route.updateTag(controller: TagsController, photosController: PhotosController) {
     post("${TAG_BASE_ROUTE}/update") {
-        if (controller.updateOne(call.receive())) {
+        if (controller.updateOne(call.receive(), photosController)) {
             call.respond(
                 HttpStatusCode.Accepted
             )

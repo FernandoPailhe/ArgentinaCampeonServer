@@ -1,6 +1,7 @@
 package com.ferpa.data.matches
 
 import com.ferpa.data.model.*
+import com.ferpa.data.photos.PhotosController
 import org.litote.kmongo.coroutine.CoroutineDatabase
 import org.litote.kmongo.eq
 import org.litote.kmongo.gt
@@ -31,8 +32,9 @@ class MatchDataSourceImpl(
         return collection.findOne(Match::id eq matchId)
     }
 
-    override suspend fun updateMatch(match: Match): Boolean {
+    override suspend fun updateMatch(match: Match, photosController: PhotosController): Boolean {
         return try {
+            if (haveToUpdate(match)) photosController.updateAllMatchTitles(match.toMatchTitle())
             collection.updateOne(Match::id eq match.id, match.updateMatch()).wasAcknowledged()
             true
         } catch (e: Exception) {
@@ -42,5 +44,10 @@ class MatchDataSourceImpl(
 
     override suspend fun deleteOneById(id: String): Boolean {
         return collection.deleteOne(Match::id eq id).wasAcknowledged()
+    }
+
+    private suspend fun haveToUpdate(match: Match): Boolean {
+        val oldMatch = match.id?.let { getMatchById(it) }
+        return (oldMatch?.toMatchTitle() != match.toMatchTitle())
     }
 }

@@ -1,7 +1,7 @@
 package com.ferpa.data.moments
 
 import com.ferpa.data.model.Moment
-import com.ferpa.data.model.Player
+import com.ferpa.data.photos.PhotosController
 
 interface MomentDataSource {
 
@@ -11,9 +11,9 @@ interface MomentDataSource {
 
     suspend fun insertMoment(moment: Moment)
 
-    suspend fun getMomentById(momentId: String): Moment?
+    suspend fun getOneById(momentId: String): Moment?
 
-    suspend fun updateMoment(moment: Moment): Boolean
+    suspend fun updateMoment(moment: Moment, photosController: PhotosController): Boolean
 
     suspend fun deleteOneById(id: String): Boolean
 }

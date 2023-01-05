@@ -4,6 +4,7 @@ package com.ferpa.data.model
 data class MomentTitle(
     val id: String? = "",
     val date: String? = "",
-    val matchTime: String? = "",
+    val gameTime: Int?,
+    val additionalTime: Int?,
     val playType: String? = ""
 )

@@ -1,6 +1,7 @@
 package com.ferpa.data.tags
 
 import com.ferpa.data.model.Tag
+import com.ferpa.data.photos.PhotosController
 
 class TagsController(
     private val dataSource: TagDataSource,
@@ -18,8 +19,8 @@ class TagsController(
         return dataSource.getOneById(id)
     }
 
-    suspend fun updateOne(item: Tag): Boolean {
-        return dataSource.updateOne(item)
+    suspend fun updateOne(item: Tag, photosController: PhotosController): Boolean {
+        return dataSource.updateOne(item, photosController)
     }
 
     suspend fun deleteOne(id: String): Boolean {

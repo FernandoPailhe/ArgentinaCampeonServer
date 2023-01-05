@@ -1,7 +1,7 @@
 package com.ferpa.data.photographer
 
-import com.ferpa.data.model.Match
 import com.ferpa.data.model.Photographer
+import com.ferpa.data.photos.PhotosController
 
 class PhotographersController(
     private val dataSource: PhotographerDataSource,
@@ -16,11 +16,11 @@ class PhotographersController(
     }
 
     suspend fun getPhotographerById(photographerId: String): Photographer? {
-        return dataSource.getPhotographerById(photographerId)
+        return dataSource.getOneById(photographerId)
     }
 
-    suspend fun updatePhotographer(photographer: Photographer): Boolean {
-        return dataSource.updatePhotographer(photographer)
+    suspend fun updatePhotographer(photographer: Photographer, photosController: PhotosController): Boolean {
+        return dataSource.updatePhotographer(photographer, photosController)
     }
 
     suspend fun deleteOne(id: String): Boolean {

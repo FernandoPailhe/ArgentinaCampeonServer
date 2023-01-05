@@ -1,6 +1,7 @@
 package com.ferpa.data.matches
 
 import com.ferpa.data.model.Match
+import com.ferpa.data.photos.PhotosController
 
 class MatchesController(
     private val dataSource: MatchDataSource,
@@ -18,8 +19,8 @@ class MatchesController(
         return dataSource.getMatchById(matchId)
     }
 
-    suspend fun updateMatch(match: Match): Boolean {
-        return dataSource.updateMatch(match)
+    suspend fun updateMatch(match: Match, photosController: PhotosController): Boolean {
+        return dataSource.updateMatch(match, photosController)
     }
 
     suspend fun deleteOne(id: String): Boolean {

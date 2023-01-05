@@ -1,8 +1,6 @@
 package com.ferpa.data.photos
 
-import com.ferpa.data.model.LastUpdatesResponse
-import com.ferpa.data.model.Photo
-import com.ferpa.data.model.Vote
+import com.ferpa.data.model.*
 
 class PhotosController(
     private val dataSource: PhotoDataSource,
@@ -62,6 +60,26 @@ class PhotosController(
 
     suspend fun updatePhoto(photo: Photo): Boolean {
         return dataSource.updatePhoto(photo)
+    }
+
+    suspend fun updateAllMatchTitles(matchTitle: MatchTitle): Boolean {
+        return dataSource.updateAllMatchTitles(matchTitle)
+    }
+
+    suspend fun updateAllPhotographerTitles(photographerTitle: PhotographerTitle): Boolean{
+        return dataSource.updateAllPhotographerTitles(photographerTitle)
+    }
+
+    suspend fun updateAllPlayerTitles(playerTitle: PlayerTitle): Boolean{
+        return dataSource.updateAllPlayerTitles(playerTitle)
+    }
+
+    suspend fun updateAllMomentTitles(momentTitle: MomentTitle): Boolean{
+        return dataSource.updateAllMomentTitles(momentTitle)
+    }
+
+    suspend fun updateAllTags(tag: Tag): Boolean{
+        return dataSource.updateAllTag(tag)
     }
 
 }

@@ -1,6 +1,7 @@
 package com.ferpa.data.photographer
 
 import com.ferpa.data.model.Photographer
+import com.ferpa.data.photos.PhotosController
 
 interface PhotographerDataSource {
 
@@ -8,9 +9,9 @@ interface PhotographerDataSource {
 
     suspend fun insertPhotographer(photographer: Photographer)
 
-    suspend fun getPhotographerById(photographerId: String): Photographer?
+    suspend fun getOneById(photographerId: String): Photographer?
 
-    suspend fun updatePhotographer(photographer: Photographer): Boolean
+    suspend fun updatePhotographer(photographer: Photographer, photosController: PhotosController): Boolean
 
     suspend fun deleteOneById(id: String): Boolean
 

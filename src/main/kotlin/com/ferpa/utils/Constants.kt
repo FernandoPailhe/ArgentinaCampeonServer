@@ -15,7 +15,7 @@ object Constants {
     const val APP_INFO_BASE_ROUTE = "/appInfo"
 
     const val DELETE_KEY = "hdsjdwueuei12312478189273aiosjiud87q2730u"
-    const val POST_KEY = "4672hd2478189sjdwueuei1231273aiosjiud87q2730u"
+    const val POST_KEY = "4672hd2478189sjdwueuei123127342387dshf27"
 
     const val SUPER_VOTE_AMOUNT = 10
 }

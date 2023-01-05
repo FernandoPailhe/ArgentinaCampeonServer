@@ -24,9 +24,10 @@ fun Match.addUUID(): Match = this.copy(id = UUID.randomUUID().toString(), lastUp
 
 fun Match.updateMatch(): Match = this.copy(lastUpdate = LocalDateTime.now().toString())
 
-fun Match.toMatchTitle(): MatchTitle? {
+fun Match.toMatchTitle(): MatchTitle {
     return MatchTitle(
         id = this.id,
+        date = this.date,
         title = "${this.tournamentInstance}: ${this.teamA} vs. ${this.teamB}",
         score = this.score
     )

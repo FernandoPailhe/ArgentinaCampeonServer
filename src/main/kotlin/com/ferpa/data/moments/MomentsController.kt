@@ -1,6 +1,7 @@
 package com.ferpa.data.moments
 
 import com.ferpa.data.model.Moment
+import com.ferpa.data.photos.PhotosController
 
 class MomentsController(
     private val dataSource: MomentDataSource,
@@ -19,11 +20,11 @@ class MomentsController(
     }
 
     suspend fun getMomentById(momentId: String): Moment? {
-        return dataSource.getMomentById(momentId)
+        return dataSource.getOneById(momentId)
     }
 
-    suspend fun updateMoment(moment: Moment): Boolean {
-        return dataSource.updateMoment(moment)
+    suspend fun updateMoment(moment: Moment, photosController: PhotosController): Boolean {
+        return dataSource.updateMoment(moment, photosController)
     }
 
     suspend fun deleteOne(id: String): Boolean {

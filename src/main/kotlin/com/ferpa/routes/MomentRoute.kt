@@ -1,7 +1,7 @@
 package com.ferpa.routes
 
-import com.ferpa.data.matches.MatchesController
 import com.ferpa.data.moments.MomentsController
+import com.ferpa.data.photos.PhotosController
 import com.ferpa.utils.Constants
 import com.ferpa.utils.Constants.MOMENT_BASE_ROUTE
 import io.ktor.application.*
@@ -50,9 +50,9 @@ fun Route.newMoment(controller: MomentsController) {
     }
 }
 
-fun Route.updateMoment(controller: MomentsController) {
+fun Route.updateMoment(controller: MomentsController, photosController: PhotosController) {
     post("${MOMENT_BASE_ROUTE}/update") {
-        if (controller.updateMoment(call.receive())) {
+        if (controller.updateMoment(call.receive(), photosController)) {
             call.respond(
                 HttpStatusCode.Accepted
             )

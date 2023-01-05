@@ -52,7 +52,7 @@ class PhotoDataSourceImpl(
     }
 
     override suspend fun getPhotosByTag(tagId: String): List<Photo> {
-        return collection.find(Photo::tags /Tag::id eq tagId)
+        return collection.find(Photo::tags / Tag::id eq tagId)
             .descendingSort(Photo::rank)
             .toList()
     }
@@ -99,8 +99,106 @@ class PhotoDataSourceImpl(
         return try {
             val win = collection.findOne(Photo::id eq vote.voteWin)
             val lost = collection.findOne(Photo::id eq vote.voteLost)
-            win?.apply { collection.updateOne(Photo::id eq vote.voteWin, win.voteWin(vote.superVote)).wasAcknowledged() }
+            win?.apply {
+                collection.updateOne(Photo::id eq vote.voteWin, win.voteWin(vote.superVote)).wasAcknowledged()
+            }
             lost?.apply { collection.updateOne(Photo::id eq vote.voteLost, lost.voteLost()).wasAcknowledged() }
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    override suspend fun updateAllMatchTitles(matchTitle: MatchTitle): Boolean {
+        return try {
+            if (matchTitle.id != null) {
+                getPhotosByMatch(matchTitle.id).forEach { oldPhoto ->
+                    if (oldPhoto.match != matchTitle) {
+                        val newPhoto = oldPhoto.copy(match = matchTitle)
+                        updatePhoto(newPhoto.updatePhoto(oldPhoto))
+                    } else {
+                        return true
+                    }
+                }
+                true
+            } else false
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    override suspend fun updateAllPhotographerTitles(newTitle: PhotographerTitle): Boolean {
+        return try {
+            if (newTitle.id != null) {
+                getPhotosByPhotographer(newTitle.id).forEach { oldPhoto ->
+                    if (oldPhoto.photographer != newTitle) {
+                        val newPhoto = oldPhoto.copy(photographer = newTitle)
+                        updatePhoto(newPhoto.updatePhoto(oldPhoto))
+                    } else {
+                        return true
+                    }
+                }
+                true
+            } else false
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    override suspend fun updateAllPlayerTitles(newTitle: PlayerTitle): Boolean {
+        return try {
+            if (newTitle.id != null) {
+                getPhotosByPlayer(newTitle.id).forEach { oldPhoto ->
+                    val newPlayerTitleList = mutableListOf<PlayerTitle?>()
+                    oldPhoto.players?.forEach { oldPlayerTitle ->
+                        if (oldPlayerTitle?.id == newTitle.id) {
+                            newPlayerTitleList.add(newTitle)
+                        } else {
+                            newPlayerTitleList.add(oldPlayerTitle)
+                        }
+                    }
+                    val newPhoto = oldPhoto.copy(players = newPlayerTitleList)
+                    updatePhoto(newPhoto.updatePhoto(oldPhoto))
+                }
+                true
+            } else false
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    override suspend fun updateAllMomentTitles(newTitle: MomentTitle): Boolean {
+        return try {
+            if (newTitle.id != null) {
+                getPhotosByMoment(newTitle.id).forEach { oldPhoto ->
+                    if (oldPhoto.moment != newTitle) {
+                        val newPhoto = oldPhoto.copy(moment = newTitle)
+                        updatePhoto(newPhoto.updatePhoto(oldPhoto))
+                    } else {
+                        return true
+                    }
+                }
+                true
+            } else false
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    override suspend fun updateAllTag(tag: Tag): Boolean {
+        return try {
+            getPhotosByTag(tag.id).forEach { oldPhoto ->
+                val newTagList = mutableListOf<Tag?>()
+                oldPhoto.tags?.forEach { oldTag ->
+                    if (oldTag?.id == tag.id) {
+                        newTagList.add(tag)
+                    } else {
+                        newTagList.add(oldTag)
+                    }
+                }
+                val newPhoto = oldPhoto.copy(tags = newTagList)
+                updatePhoto(newPhoto.updatePhoto(oldPhoto))
+            }
             true
         } catch (e: Exception) {
             false

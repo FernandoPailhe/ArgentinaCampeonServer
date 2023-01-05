@@ -1,6 +1,7 @@
 package com.ferpa.routes
 
 
+import com.ferpa.data.photos.PhotosController
 import com.ferpa.data.players.PlayersController
 import com.ferpa.utils.Constants
 import com.ferpa.utils.Constants.PLAYER_BASE_ROUTE
@@ -40,9 +41,9 @@ fun Route.newPlayer(controller: PlayersController) {
     }
 }
 
-fun Route.updatePlayer(controller: PlayersController) {
+fun Route.updatePlayer(controller: PlayersController, photosController: PhotosController) {
     post("${PLAYER_BASE_ROUTE}/update") {
-        if (controller.updatePlayer(call.receive())) {
+        if (controller.updatePlayer(call.receive(), photosController)) {
             call.respond(
                 HttpStatusCode.Accepted
             )

@@ -1,6 +1,7 @@
 package com.ferpa.data.tags
 
 import com.ferpa.data.model.Tag
+import com.ferpa.data.photos.PhotosController
 
 interface TagDataSource {
 
@@ -10,7 +11,7 @@ interface TagDataSource {
 
     suspend fun getOneById(id: String): Tag?
 
-    suspend fun updateOne(tag: Tag): Boolean
+    suspend fun updateOne(tag: Tag, photosController: PhotosController): Boolean
 
     suspend fun deleteOneById(id: String): Boolean
 

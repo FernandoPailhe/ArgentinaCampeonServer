@@ -1,8 +1,6 @@
 package com.ferpa.data.photos
 
-import com.ferpa.data.model.LastUpdatesResponse
-import com.ferpa.data.model.Photo
-import com.ferpa.data.model.Vote
+import com.ferpa.data.model.*
 
 interface PhotoDataSource {
 
@@ -18,7 +16,7 @@ interface PhotoDataSource {
 
     suspend fun getPhotosByMatch(matchId: String): List<Photo>
 
-    suspend fun getPhotosByTag(tag: String): List<Photo>
+    suspend fun getPhotosByTag(tagId: String): List<Photo>
 
     suspend fun getPhotosByPhotographer(photographerId: String): List<Photo>
 
@@ -33,5 +31,10 @@ interface PhotoDataSource {
     suspend fun updatePhoto(photo: Photo): Boolean
 
     suspend fun postVote(vote: Vote): Boolean
+    suspend fun updateAllMatchTitles(matchTitle: MatchTitle): Boolean
+    suspend fun updateAllPhotographerTitles(newTitle: PhotographerTitle): Boolean
+    suspend fun updateAllPlayerTitles(newTitle: PlayerTitle): Boolean
+    suspend fun updateAllMomentTitles(newTitle: MomentTitle): Boolean
+    suspend fun updateAllTag(tag: Tag): Boolean
 
 }

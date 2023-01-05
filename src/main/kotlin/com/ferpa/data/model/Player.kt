@@ -9,7 +9,7 @@ data class Player(
     val displayName: String? = "",
     val name: String = "",
     val nickName: String? = "",
-    val birthday: Int? = null,
+    val birthday: String? = null,
     val position: String? = null,
     val nationalTeam: String? = "",
     val number: Int? = null,
@@ -24,17 +24,9 @@ fun Player.addUUID(): Player = this.copy(id = UUID.randomUUID().toString(), last
 fun Player.updatePlayer(): Player = this.copy(lastUpdate = LocalDateTime.now().toString())
 
 fun Player.toPlayerTitle(): PlayerTitle {
-    val displayName = if (this.displayName.isNullOrEmpty()) {
-        if (this.nickName != null) {
-            "${this.nickName} ${this.name.split(" ").last()}"
-        } else {
-            name
-        }
-    } else this.displayName
-
     return PlayerTitle(
         id = this.id,
-        displayName = displayName,
+        displayName = this.displayName,
         nationalTeam = this.nationalTeam
     )
 }

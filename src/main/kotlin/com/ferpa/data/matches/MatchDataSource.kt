@@ -1,6 +1,7 @@
 package com.ferpa.data.matches
 
 import com.ferpa.data.model.Match
+import com.ferpa.data.photos.PhotosController
 
 interface MatchDataSource {
 
@@ -10,7 +11,7 @@ interface MatchDataSource {
 
     suspend fun getMatchById(matchId: String): Match?
 
-    suspend fun updateMatch(match: Match): Boolean
+    suspend fun updateMatch(match: Match, photosController: PhotosController): Boolean
 
     suspend fun deleteOneById(id: String): Boolean
 
