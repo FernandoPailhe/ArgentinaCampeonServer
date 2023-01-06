@@ -2,6 +2,7 @@ package com.ferpa.routes
 
 
 import com.ferpa.data.photos.PhotosController
+import com.ferpa.utils.Constants.BEST_PHOTO_LIMIT
 import com.ferpa.utils.Constants.DELETE_KEY
 import com.ferpa.utils.Constants.MATCH_BASE_ROUTE
 import com.ferpa.utils.Constants.MOMENT_BASE_ROUTE
@@ -20,7 +21,6 @@ private const val BASE_URL = "http://192.168.100.4:8080"
 // "http:// " aca va el ip local ":8080" en este caso 192.168.100.4
 // "http://10.0.2.2:8080" con esta direccion es para probarlo desde el emulador
 
-
 fun Route.getLastUpdatesDates(
     photosController: PhotosController
 ) {
@@ -32,21 +32,32 @@ fun Route.getLastUpdatesDates(
     }
 }
 
-fun Route.getNewPhotos(photosController: PhotosController) {
+fun Route.photos(photosController: PhotosController) {
     get(PHOTO_BASE_ROUTE) {
-        val updateFrom = call.request.queryParameters["updateFrom"]
+        val getFrom = call.request.queryParameters["getFrom"]
         call.respond(
             HttpStatusCode.OK,
-            photosController.getPhotos(updateFrom)
+            photosController.getPhotos(getFrom)
         )
     }
 }
 
-fun Route.photos(photosController: PhotosController) {
-    get(PHOTO_BASE_ROUTE) {
+fun Route.updatePhotos(photosController: PhotosController) {
+    get("$PHOTO_BASE_ROUTE/updates") {
+        val getFrom = call.request.queryParameters["getFrom"]
         call.respond(
             HttpStatusCode.OK,
-            photosController.getAllPhotos()
+            photosController.getUpdatePhotos(getFrom)
+        )
+    }
+}
+
+fun Route.rankUpdates(photosController: PhotosController) {
+    get("$PHOTO_BASE_ROUTE/rankUpdates") {
+        val getFrom = call.request.queryParameters["getFrom"]
+        call.respond(
+            HttpStatusCode.OK,
+            photosController.getRankUpdates(getFrom)
         )
     }
 }
@@ -55,21 +66,10 @@ fun Route.bestPhotos(
     photosController: PhotosController,
 ) {
     get("${PHOTO_BASE_ROUTE}/best") {
+        val limit = (call.request.queryParameters["limit"])?.toInt() ?: BEST_PHOTO_LIMIT
         call.respond(
             HttpStatusCode.OK,
-            photosController.getAllPhotos()
-        )
-    }
-}
-
-fun Route.photosTitle(
-    photosController: PhotosController,
-) {
-    get("${PHOTO_BASE_ROUTE}/versus") {
-        val photosTitle = photosController.getVersusPhotos()
-        call.respond(
-            HttpStatusCode.OK,
-            photosTitle
+            photosController.getBestPhotos(limit)
         )
     }
 }

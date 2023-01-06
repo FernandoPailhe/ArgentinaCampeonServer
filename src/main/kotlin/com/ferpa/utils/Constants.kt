@@ -4,7 +4,7 @@ object Constants {
 
     const val BASE_URL = "http://192.168.100.4:8080"
     const val DB_NAME = "photos"
-    const val VOTE_ROLL = 20
+    const val BEST_PHOTO_LIMIT = 20
 
     const val MATCH_BASE_ROUTE = "/matches"
     const val PLAYER_BASE_ROUTE = "/players"

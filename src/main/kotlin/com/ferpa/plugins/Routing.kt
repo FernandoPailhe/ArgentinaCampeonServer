@@ -24,11 +24,11 @@ fun Application.configureRouting() {
     val appInfoController by inject<AppInfoController>()
     install(Routing){
         getLastUpdatesDates(photosController)
-        getNewPhotos(photosController)
-        photosTitle(photosController)
-        bestPhotos(photosController)
         // Photo routes
         photos(photosController)
+        updatePhotos(photosController)
+        rankUpdates(photosController)
+        bestPhotos(photosController)
         newPhoto(photosController)
         deletePhoto(photosController)
         postVote(photosController)

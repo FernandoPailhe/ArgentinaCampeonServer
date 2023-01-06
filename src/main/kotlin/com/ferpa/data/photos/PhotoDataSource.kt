@@ -6,11 +6,13 @@ interface PhotoDataSource {
 
     suspend fun getLastUpdatesDates(): LastUpdatesResponse
 
-    suspend fun getAllPhotos(): List<Photo>
+    suspend fun getPhotos(getFrom: String? = ""): List<Photo>
 
-    suspend fun getPhotos(updateFrom: String? = ""): List<Photo>
+    suspend fun getUpdatePhotos(getFrom: String?): List<Photo>
 
-    suspend fun getVersusPhotos(): List<Photo>
+    suspend fun getRankUpdates(getFrom: String?): List<RankUpdate>
+
+    suspend fun getBestPhotos(limit: Int): List<Photo>
 
     suspend fun getPhotosByPlayer(playerId: String): List<Photo>
 
@@ -31,10 +33,15 @@ interface PhotoDataSource {
     suspend fun updatePhoto(photo: Photo): Boolean
 
     suspend fun postVote(vote: Vote): Boolean
+
     suspend fun updateAllMatchTitles(matchTitle: MatchTitle): Boolean
+
     suspend fun updateAllPhotographerTitles(newTitle: PhotographerTitle): Boolean
+
     suspend fun updateAllPlayerTitles(newTitle: PlayerTitle): Boolean
+
     suspend fun updateAllMomentTitles(newTitle: MomentTitle): Boolean
+
     suspend fun updateAllTag(tag: Tag): Boolean
 
 }

@@ -1,8 +1,5 @@
 package com.ferpa.data.model
 
-import com.ferpa.data.matches.MatchesController
-import com.ferpa.data.photographer.PhotographersController
-import com.ferpa.data.players.PlayersController
 import com.ferpa.utils.Constants.SUPER_VOTE_AMOUNT
 import com.ferpa.utils.divideToPercent
 import java.time.LocalDateTime
@@ -52,3 +49,5 @@ fun Photo.voteLost(): Photo {
     val rank = votes.divideToPercent(this.versus)
     return this.copy(versus = versus, rank = rank, votesUpdate = LocalDateTime.now().toString())
 }
+
+fun Photo.toRankUpdate(): RankUpdate = RankUpdate(this.id, this.rank)

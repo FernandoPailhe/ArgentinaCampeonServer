@@ -1,7 +1,7 @@
 package com.ferpa.data.photos
 
 import com.ferpa.data.model.*
-import com.ferpa.utils.Constants.VOTE_ROLL
+import com.ferpa.utils.toRankUpdateList
 import org.litote.kmongo.*
 import org.litote.kmongo.coroutine.CoroutineDatabase
 
@@ -23,20 +23,39 @@ class PhotoDataSourceImpl(
         )
     }
 
-    override suspend fun getAllPhotos(): List<Photo> {
-        return collection.find()
-            .descendingSort(Photo::rank)
-            .toList()
+    override suspend fun getPhotos(getFrom: String?): List<Photo> {
+        return if (getFrom.isNullOrEmpty()) {
+            collection.find().descendingSort(Photo::insertDate).toList()
+        } else {
+            collection.find(Photo::insertDate gt getFrom)
+                .descendingSort(Photo::insertDate)
+                .toList()
+        }
     }
 
-    override suspend fun getPhotos(updateFrom: String?): List<Photo> {
-        return collection.find(Photo::insertDate gt updateFrom).toList()
+    override suspend fun getUpdatePhotos(getFrom: String?): List<Photo> {
+        return if (getFrom.isNullOrEmpty()) {
+            collection.find().descendingSort(Photo::lastUpdate).toList()
+        } else {
+            collection.find(Photo::lastUpdate gt getFrom)
+                .descendingSort(Photo::lastUpdate)
+                .toList()
+        }
     }
 
-    override suspend fun getVersusPhotos(): List<Photo> {
-        return collection.find()
-            .ascendingSort(Photo::votes).limit(VOTE_ROLL)
-            .toList()
+    override suspend fun getRankUpdates(getFrom: String?): List<RankUpdate> {
+        return if (getFrom.isNullOrEmpty()) {
+            collection.find().descendingSort(Photo::votesUpdate).toList().toRankUpdateList()
+        } else {
+            collection.find(Photo::votesUpdate gt getFrom)
+                .descendingSort(Photo::votesUpdate)
+                .toList()
+                .toRankUpdateList()
+        }
+    }
+
+    override suspend fun getBestPhotos(limit: Int): List<Photo> {
+        return collection.find().descendingSort(Photo::rank).limit(limit).toList()
     }
 
     override suspend fun getPhotosByPlayer(playerId: String): List<Photo> {

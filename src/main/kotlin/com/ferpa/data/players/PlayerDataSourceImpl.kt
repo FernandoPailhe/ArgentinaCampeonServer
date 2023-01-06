@@ -35,7 +35,6 @@ class PlayerDataSourceImpl(
     override suspend fun updatePlayer(player: Player, photosController: PhotosController): Boolean {
         return try {
             if (haveToUpdate(player)) photosController.updateAllPlayerTitles(player.toPlayerTitle())
-//            val oldPlayer = player.id?.let { getOneById(it) }
             collection.updateOne(Player::id eq player.id, player.updatePlayer()).wasAcknowledged()
             true
         } catch (e: Exception) {

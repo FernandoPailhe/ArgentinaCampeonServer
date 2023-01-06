@@ -1,6 +1,7 @@
 package com.ferpa.data.photos
 
 import com.ferpa.data.model.*
+import com.ferpa.utils.Constants
 
 class PhotosController(
     private val dataSource: PhotoDataSource,
@@ -10,16 +11,21 @@ class PhotosController(
         return dataSource.getLastUpdatesDates()
     }
 
-    suspend fun getAllPhotos(): List<Photo> {
-        return dataSource.getAllPhotos()
+    suspend fun getPhotos(getFrom: String?): List<Photo> {
+        return dataSource.getPhotos(getFrom)
     }
 
-    suspend fun getPhotos(updateFrom: String?): List<Photo> {
-        return dataSource.getPhotos(updateFrom)
+
+    suspend fun getUpdatePhotos(getFrom: String?): List<Photo>{
+        return dataSource.getUpdatePhotos(getFrom)
     }
 
-    suspend fun getVersusPhotos(): List<Photo> {
-        return dataSource.getVersusPhotos()
+    suspend fun getRankUpdates(getFrom: String?): List<RankUpdate> {
+        return dataSource.getRankUpdates(getFrom)
+    }
+
+    suspend fun getBestPhotos(limit: Int = Constants.BEST_PHOTO_LIMIT): List<Photo> {
+        return dataSource.getBestPhotos(limit)
     }
 
     suspend fun getPhotosByPlayer(playerId: String): List<Photo> {
