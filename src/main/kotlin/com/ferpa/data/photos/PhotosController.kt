@@ -48,6 +48,10 @@ class PhotosController(
         return dataSource.getPhotosByMoment(momentId)
     }
 
+    suspend fun getPhotosByCustomQuery(customQuery: CustomQuery): List<Photo> {
+        return dataSource.getPhotosByCustomQuery(customQuery)
+    }
+
     suspend fun getPhotoById(photoId: String): Photo? {
         return dataSource.getPhotoById(photoId)
     }

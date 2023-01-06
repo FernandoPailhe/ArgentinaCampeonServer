@@ -24,6 +24,8 @@ interface PhotoDataSource {
 
     suspend fun getPhotosByMoment(momentId: String): List<Photo>
 
+    suspend fun getPhotosByCustomQuery(customQuery: CustomQuery): List<Photo>
+
     suspend fun getPhotoById(photoId: String): Photo?
 
     suspend fun deleteOneById(id: String): Boolean

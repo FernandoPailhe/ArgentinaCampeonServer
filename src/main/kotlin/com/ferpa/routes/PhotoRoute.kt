@@ -1,6 +1,7 @@
 package com.ferpa.routes
 
 
+import com.ferpa.data.model.CustomQuery
 import com.ferpa.data.photos.PhotosController
 import com.ferpa.utils.Constants.BEST_PHOTO_LIMIT
 import com.ferpa.utils.Constants.DELETE_KEY
@@ -130,6 +131,26 @@ fun Route.photosByMoment(
         call.respond(
             HttpStatusCode.OK,
             photosController.getPhotosByMoment(momentId)
+        )
+    }
+}
+
+fun Route.photosByCustomQuery(
+    photosController: PhotosController,
+) {
+    get("${PHOTO_BASE_ROUTE}/customQuery") {
+        val customQuery = CustomQuery(
+            playerId = call.request.queryParameters["playerId"] ?: "",
+            matchId = call.request.queryParameters["matchId"] ?: "",
+            tagId = call.request.queryParameters["tagId"] ?: "",
+            photographerId = call.request.queryParameters["photographerId"] ?: "",
+            momentId = call.request.queryParameters["momentId"] ?: "",
+            sortBy = call.request.queryParameters["sortBy"] ?: "",
+            sortAscending = call.request.queryParameters["sortAscending"] == "true"
+        )
+        call.respond(
+            HttpStatusCode.OK,
+            photosController.getPhotosByCustomQuery(customQuery)
         )
     }
 }

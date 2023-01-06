@@ -38,6 +38,7 @@ fun Application.configureRouting() {
         photosByTag(photosController)
         photosByPhotographer(photosController)
         photosByMoment(photosController)
+        photosByCustomQuery(photosController)
         updatePhoto(photosController)
         // Player routes
         players(playersController)

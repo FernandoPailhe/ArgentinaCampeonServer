@@ -88,6 +88,10 @@ class PhotoDataSourceImpl(
             .toList()
     }
 
+    override suspend fun getPhotosByCustomQuery(customQuery: CustomQuery): List<Photo> {
+        return customQuery.filter(collection) ?: emptyList()
+    }
+
     override suspend fun getPhotoById(photoId: String): Photo? {
         return collection.findOne(Photo::id eq photoId)
     }
