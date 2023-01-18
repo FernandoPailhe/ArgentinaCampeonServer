@@ -5,7 +5,7 @@ import java.util.*
 
 @kotlinx.serialization.Serializable
 data class AppInfo(
-    val id: String? = "",
+    val id: String = "",
     val welcome: List<Info?>? = emptyList(),
     val tutorial: List<Info?>? = emptyList(),
     val share: List<Info?>? = emptyList(),

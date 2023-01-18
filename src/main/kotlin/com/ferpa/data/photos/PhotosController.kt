@@ -16,12 +16,16 @@ class PhotosController(
     }
 
 
-    suspend fun getUpdatePhotos(getFrom: String?): List<Photo>{
+    suspend fun getUpdatePhotos(getFrom: String?): List<Photo> {
         return dataSource.getUpdatePhotos(getFrom)
     }
 
     suspend fun getRankUpdates(getFrom: String?): List<RankUpdate> {
         return dataSource.getRankUpdates(getFrom)
+    }
+
+    suspend fun resetRank(newVotes: Long = 50, newVersus: Long = 70, randomRange: Int = 10): Boolean {
+        return dataSource.resetRank(newVotes, newVersus, randomRange)
     }
 
     suspend fun getBestPhotos(limit: Int = Constants.BEST_PHOTO_LIMIT): List<Photo> {
@@ -69,26 +73,26 @@ class PhotosController(
     }
 
     suspend fun updatePhoto(photo: Photo): Boolean {
-        return dataSource.updatePhoto(photo)
+        return dataSource.updatePhotoAndKeepVotes(photo)
     }
 
     suspend fun updateAllMatchTitles(matchTitle: MatchTitle): Boolean {
         return dataSource.updateAllMatchTitles(matchTitle)
     }
 
-    suspend fun updateAllPhotographerTitles(photographerTitle: PhotographerTitle): Boolean{
+    suspend fun updateAllPhotographerTitles(photographerTitle: PhotographerTitle): Boolean {
         return dataSource.updateAllPhotographerTitles(photographerTitle)
     }
 
-    suspend fun updateAllPlayerTitles(playerTitle: PlayerTitle): Boolean{
+    suspend fun updateAllPlayerTitles(playerTitle: PlayerTitle): Boolean {
         return dataSource.updateAllPlayerTitles(playerTitle)
     }
 
-    suspend fun updateAllMomentTitles(momentTitle: MomentTitle): Boolean{
+    suspend fun updateAllMomentTitles(momentTitle: MomentTitle): Boolean {
         return dataSource.updateAllMomentTitles(momentTitle)
     }
 
-    suspend fun updateAllTags(tag: Tag): Boolean{
+    suspend fun updateAllTags(tag: Tag): Boolean {
         return dataSource.updateAllTag(tag)
     }
 

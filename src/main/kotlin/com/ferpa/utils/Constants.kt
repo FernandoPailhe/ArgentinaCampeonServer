@@ -18,4 +18,6 @@ object Constants {
     const val POST_KEY = "4672hd2478189sjdwueuei123127342387dshf27"
 
     const val SUPER_VOTE_AMOUNT = 10
+
+    const val DELETED_PHOTOS_VALUE = -2
 }

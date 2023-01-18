@@ -1,6 +1,7 @@
 package com.ferpa.utils
 
 import com.ferpa.data.model.Photo
+import com.ferpa.data.model.resetRank
 import com.ferpa.data.model.toRankUpdate
 import kotlin.math.roundToInt
 

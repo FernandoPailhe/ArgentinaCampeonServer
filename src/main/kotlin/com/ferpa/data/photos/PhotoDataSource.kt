@@ -12,6 +12,8 @@ interface PhotoDataSource {
 
     suspend fun getRankUpdates(getFrom: String?): List<RankUpdate>
 
+    suspend fun resetRank(newVotes: Long = 50, newVersus: Long = 70, randomRange: Int = 10): Boolean
+
     suspend fun getBestPhotos(limit: Int): List<Photo>
 
     suspend fun getPhotosByPlayer(playerId: String): List<Photo>
@@ -32,7 +34,9 @@ interface PhotoDataSource {
 
     suspend fun insertPhoto(photo: Photo)
 
-    suspend fun updatePhoto(photo: Photo): Boolean
+    suspend fun updatePhotoAndKeepVotes(photo: Photo): Boolean
+
+    suspend fun updateCompletePhoto(photo: Photo): Boolean
 
     suspend fun postVote(vote: Vote): Boolean
 

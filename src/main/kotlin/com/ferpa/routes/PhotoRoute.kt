@@ -10,12 +10,15 @@ import com.ferpa.utils.Constants.MOMENT_BASE_ROUTE
 import com.ferpa.utils.Constants.PHOTOGRAPHER_BASE_ROUTE
 import com.ferpa.utils.Constants.PHOTO_BASE_ROUTE
 import com.ferpa.utils.Constants.PLAYER_BASE_ROUTE
+import com.ferpa.utils.Constants.POST_KEY
 import com.ferpa.utils.Constants.TAG_BASE_ROUTE
 import io.ktor.application.*
 import io.ktor.http.*
+import io.ktor.http.content.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
+import java.io.File
 
 private const val BASE_URL = "http://192.168.100.4:8080"
 
@@ -191,6 +194,26 @@ fun Route.updatePhoto(photosController: PhotosController) {
     }
 }
 
+fun Route.resetRank(photosController: PhotosController) {
+    post("${PHOTO_BASE_ROUTE}/resetRank"){
+        if (call.request.queryParameters["postkey"] == POST_KEY) {
+            if (photosController.resetRank()) {
+                call.respond(
+                    HttpStatusCode.Accepted
+                )
+            } else {
+                call.respond(
+                    HttpStatusCode.NotImplemented
+                )
+            }
+        } else {
+            call.respond(
+                HttpStatusCode.Unauthorized
+            )
+        }
+    }
+}
+
 fun Route.postVote(photosController: PhotosController) {
     post("${PHOTO_BASE_ROUTE}/vote") {
         if (photosController.postVote(call.receive())) {
@@ -202,7 +225,6 @@ fun Route.postVote(photosController: PhotosController) {
                 HttpStatusCode.NotImplemented
             )
         }
-
     }
 }
 
@@ -226,3 +248,37 @@ fun Route.deletePhoto(photosController: PhotosController) {
         }
     }
 }
+
+/*
+fun Route.multipartUpload() {
+    /**
+     * Example
+     */
+    var fileDescription = ""
+    var fileName = ""
+
+    post("/upload") {
+        val multipartData = call.receiveMultipart()
+
+        multipartData.forEachPart { part ->
+            when (part) {
+                is PartData.FormItem -> {
+                    fileDescription = part.value
+                }
+
+                is PartData.FileItem -> {
+                    fileName = part.originalFileName as String
+                    val fileBytes = part.streamProvider().readBytes()
+                    File("uploads/$fileName").writeBytes(fileBytes)
+                }
+
+                else -> {}
+            }
+            part.dispose()
+        }
+
+        call.respondText("$fileDescription is uploaded to 'uploads/$fileName'")
+    }
+
+}
+ */

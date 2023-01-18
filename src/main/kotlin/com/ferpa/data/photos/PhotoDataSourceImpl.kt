@@ -1,6 +1,7 @@
 package com.ferpa.data.photos
 
 import com.ferpa.data.model.*
+import com.ferpa.utils.Constants.DELETED_PHOTOS_VALUE
 import com.ferpa.utils.toRankUpdateList
 import org.litote.kmongo.*
 import org.litote.kmongo.coroutine.CoroutineDatabase
@@ -25,7 +26,7 @@ class PhotoDataSourceImpl(
 
     override suspend fun getPhotos(getFrom: String?): List<Photo> {
         return if (getFrom.isNullOrEmpty()) {
-            collection.find().descendingSort(Photo::insertDate).toList()
+            collection.find().filter(Photo::rarity gt DELETED_PHOTOS_VALUE).descendingSort(Photo::insertDate).toList()
         } else {
             collection.find(Photo::insertDate gt getFrom)
                 .descendingSort(Photo::insertDate)
@@ -51,6 +52,21 @@ class PhotoDataSourceImpl(
                 .descendingSort(Photo::votesUpdate)
                 .toList()
                 .toRankUpdateList()
+        }
+    }
+
+    override suspend fun resetRank(newVotes: Long, newVersus: Long, randomRange: Int): Boolean {
+        return try {
+            collection.find().toList().forEach {
+                updateCompletePhoto(it.resetRank(
+                    newVotes = newVotes,
+                    newVersus = newVersus,
+                    randomRange = randomRange
+                ))
+            }
+            true
+        } catch (e: java.lang.Exception){
+            false
         }
     }
 
@@ -104,11 +120,25 @@ class PhotoDataSourceImpl(
         collection.insertOne(photo.newPhoto())
     }
 
-    override suspend fun updatePhoto(photo: Photo): Boolean {
+    override suspend fun updatePhotoAndKeepVotes(photo: Photo): Boolean {
         return try {
             val oldPhoto = collection.findOne(Photo::id eq photo.id)
             if (oldPhoto != null) {
                 collection.updateOne(Photo::id eq photo.id, photo.updatePhoto(oldPhoto)).wasAcknowledged()
+                true
+            } else {
+                false
+            }
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    override suspend fun updateCompletePhoto(photo: Photo): Boolean {
+        return try {
+            val oldPhoto = collection.findOne(Photo::id eq photo.id)
+            if (oldPhoto != null) {
+                collection.updateOne(Photo::id eq photo.id, photo).wasAcknowledged()
                 true
             } else {
                 false
@@ -138,7 +168,7 @@ class PhotoDataSourceImpl(
                 getPhotosByMatch(matchTitle.id).forEach { oldPhoto ->
                     if (oldPhoto.match != matchTitle) {
                         val newPhoto = oldPhoto.copy(match = matchTitle)
-                        updatePhoto(newPhoto.updatePhoto(oldPhoto))
+                        updatePhotoAndKeepVotes(newPhoto.updatePhoto(oldPhoto))
                     } else {
                         return true
                     }
@@ -156,7 +186,7 @@ class PhotoDataSourceImpl(
                 getPhotosByPhotographer(newTitle.id).forEach { oldPhoto ->
                     if (oldPhoto.photographer != newTitle) {
                         val newPhoto = oldPhoto.copy(photographer = newTitle)
-                        updatePhoto(newPhoto.updatePhoto(oldPhoto))
+                        updatePhotoAndKeepVotes(newPhoto.updatePhoto(oldPhoto))
                     } else {
                         return true
                     }
@@ -181,7 +211,7 @@ class PhotoDataSourceImpl(
                         }
                     }
                     val newPhoto = oldPhoto.copy(players = newPlayerTitleList)
-                    updatePhoto(newPhoto.updatePhoto(oldPhoto))
+                    updatePhotoAndKeepVotes(newPhoto.updatePhoto(oldPhoto))
                 }
                 true
             } else false
@@ -196,7 +226,7 @@ class PhotoDataSourceImpl(
                 getPhotosByMoment(newTitle.id).forEach { oldPhoto ->
                     if (oldPhoto.moment != newTitle) {
                         val newPhoto = oldPhoto.copy(moment = newTitle)
-                        updatePhoto(newPhoto.updatePhoto(oldPhoto))
+                        updatePhotoAndKeepVotes(newPhoto.updatePhoto(oldPhoto))
                     } else {
                         return true
                     }
@@ -220,7 +250,7 @@ class PhotoDataSourceImpl(
                     }
                 }
                 val newPhoto = oldPhoto.copy(tags = newTagList)
-                updatePhoto(newPhoto.updatePhoto(oldPhoto))
+                updatePhotoAndKeepVotes(newPhoto.updatePhoto(oldPhoto))
             }
             true
         } catch (e: Exception) {

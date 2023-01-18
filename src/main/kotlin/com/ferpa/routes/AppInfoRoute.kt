@@ -21,7 +21,7 @@ fun Route.appInfo(controller: AppInfoController) {
 }
 
 fun Route.appInfoById(controller: AppInfoController) {
-    get ("${APP_INFO_BASE_ROUTE}/{id}") {
+    get("${APP_INFO_BASE_ROUTE}/{id}") {
         val id = call.parameters["id"] ?: ""
         val response = controller.getOneById(id) ?: HttpStatusCode.NoContent
         call.respond(
@@ -33,30 +33,42 @@ fun Route.appInfoById(controller: AppInfoController) {
 
 fun Route.newAppInfo(controller: AppInfoController) {
     post("${APP_INFO_BASE_ROUTE}/new") {
-        controller.insertOne(call.receive())
-        call.respond(
-            HttpStatusCode.Accepted
-        )
-    }
-}
-
-fun Route.updateAppInfo(controller: AppInfoController) {
-    post("${APP_INFO_BASE_ROUTE}/update") {
-        if (controller.updateOne(call.receive())) {
+        if (call.request.queryParameters["postkey"] == Constants.POST_KEY) {
+            controller.insertOne(call.receive())
             call.respond(
                 HttpStatusCode.Accepted
             )
         } else {
             call.respond(
-                HttpStatusCode.NotImplemented
+                HttpStatusCode.Unauthorized
             )
         }
     }
 }
 
-fun Route.deleteAppInfo(controller: AppInfoController){
+fun Route.updateAppInfo(controller: AppInfoController) {
+    post("${APP_INFO_BASE_ROUTE}/update") {
+        if (call.request.queryParameters["postkey"] == Constants.POST_KEY) {
+            if (controller.updateOne(call.receive())) {
+                call.respond(
+                    HttpStatusCode.Accepted
+                )
+            } else {
+                call.respond(
+                    HttpStatusCode.NotImplemented
+                )
+            }
+        } else {
+            call.respond(
+                HttpStatusCode.Unauthorized
+            )
+        }
+    }
+}
+
+fun Route.deleteAppInfo(controller: AppInfoController) {
     delete("${APP_INFO_BASE_ROUTE}/{id}") {
-        if (call.request.queryParameters["deleteKey"] == Constants.DELETE_KEY){
+        if (call.request.queryParameters["deleteKey"] == Constants.DELETE_KEY) {
             val id = call.parameters["id"] ?: ""
             if (controller.deleteOne(id)) {
                 call.respond(

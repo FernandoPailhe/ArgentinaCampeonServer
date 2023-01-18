@@ -13,7 +13,7 @@ plugins {
     application
     kotlin("jvm") version "1.6.20"
     id("org.jetbrains.kotlin.plugin.serialization") version "1.6.21"
-    id("com.github.johnrengelman.shadow") version "7.1.2"
+    id("com.github.johnrengelman.shadow") version "5.2.0"
 }
 
 group = "com.ferpa"
@@ -21,9 +21,9 @@ version = "0.0.1"
 
 application {
     mainClass.set("io.ktor.server.netty.EngineMain")
-
-    val isDevelopment: Boolean = project.ext.has("development")
-    applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
+    project.setProperty("mainClassName", mainClass.get())
+//    val isDevelopment: Boolean = project.ext.has("development")
+//    applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
 }
 
 repositories {
@@ -88,14 +88,14 @@ task("deploy") {
     ant.withGroovyBuilder {
         doLast {
             val knownHosts = File.createTempFile("knownhosts", "txt")
-            val user = "ubuntu"
-            val host = "129.151.106.230"
-            val pk = file("keys/machinestockserver")
+            val user = "root"
+            val host = "181.215.135.148"
+            val pk = file("keys/argentinacampeon")
             val jarFileName = "com.ferpa.machine-stock-$version-all.jar"
             try {
                 "scp"(
                     "file" to file("build/libs/$jarFileName"),
-                    "todir" to "$user@$host:/home/ubuntu",//Maybe is /home/ubuntu
+                    "todir" to "$user@$host:/root/arg",
                     "keyfile" to pk,
                     "trust" to true,
                     "knownhosts" to knownHosts
@@ -106,7 +106,7 @@ task("deploy") {
                     "keyfile" to pk,
                     "trust" to true,
                     "knownhosts" to knownHosts,
-                    "command" to "mv /machinestock/$jarFileName /machinestock/machinestock-server.jar"// o asi /ubuntu/machinestock/$jarFileName /ubuntu/machinestock/machinestock-server.jar"
+                    "command" to "mv /root/arg/$jarFileName /root/arg/arg.jar"// o asi /ubuntu/machinestock/$jarFileName /ubuntu/machinestock/machinestock-server.jar"
                 )
                 "ssh"(
                     "host" to host,
@@ -114,7 +114,7 @@ task("deploy") {
                     "keyfile" to pk,
                     "trust" to true,
                     "knownhosts" to knownHosts,
-                    "command" to "systemctl stop machinestock"
+                    "command" to "systemctl stop arg"
                 )
                 "ssh"(
                     "host" to host,
@@ -122,7 +122,7 @@ task("deploy") {
                     "keyfile" to pk,
                     "trust" to true,
                     "knownhosts" to knownHosts,
-                    "command" to "systemctl start machinestock"
+                    "command" to "systemctl start arg"
                 )
             } finally {
                 knownHosts.delete()

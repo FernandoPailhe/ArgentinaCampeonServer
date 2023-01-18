@@ -40,6 +40,7 @@ fun Application.configureRouting() {
         photosByMoment(photosController)
         photosByCustomQuery(photosController)
         updatePhoto(photosController)
+        resetRank(photosController)
         // Player routes
         players(playersController)
         newPlayer(playersController)

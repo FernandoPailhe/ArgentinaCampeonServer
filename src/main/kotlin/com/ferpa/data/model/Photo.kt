@@ -3,7 +3,7 @@ package com.ferpa.data.model
 import com.ferpa.utils.Constants.SUPER_VOTE_AMOUNT
 import com.ferpa.utils.divideToPercent
 import java.time.LocalDateTime
-
+import kotlin.random.Random
 import java.util.*
 
 @kotlinx.serialization.Serializable
@@ -51,3 +51,16 @@ fun Photo.voteLost(): Photo {
 }
 
 fun Photo.toRankUpdate(): RankUpdate = RankUpdate(this.id, this.rank)
+
+fun Photo.resetRank(newVotes: Long = 50, newVersus: Long = 70, randomRange: Int = 10): Photo {
+    val votes = newVotes + Random.nextInt(0, randomRange)
+    val versus = newVersus + Random.nextInt(0, randomRange)
+    val rank = votes.divideToPercent(versus)
+    return this.copy(
+        lastUpdate = LocalDateTime.now().toString(),
+        votesUpdate = LocalDateTime.now().toString(),
+        votes = votes,
+        versus = versus,
+        rank = rank
+    )
+}
