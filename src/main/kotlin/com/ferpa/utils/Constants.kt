@@ -20,4 +20,9 @@ object Constants {
     const val SUPER_VOTE_AMOUNT = 10
 
     const val DELETED_PHOTOS_VALUE = -2
+
+    const val NEW_VOTES_DEFAULT_VALUE = 50
+    const val NEW_VERSUS_DEFAULT_VALUE = 70
+    const val RANDOM_RANGE_DEFAULT_VALUE = 10
+
 }

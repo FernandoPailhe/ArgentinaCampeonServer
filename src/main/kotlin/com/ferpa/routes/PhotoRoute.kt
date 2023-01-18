@@ -14,11 +14,9 @@ import com.ferpa.utils.Constants.POST_KEY
 import com.ferpa.utils.Constants.TAG_BASE_ROUTE
 import io.ktor.application.*
 import io.ktor.http.*
-import io.ktor.http.content.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
-import java.io.File
 
 private const val BASE_URL = "http://192.168.100.4:8080"
 
@@ -26,7 +24,7 @@ private const val BASE_URL = "http://192.168.100.4:8080"
 // "http://10.0.2.2:8080" con esta direccion es para probarlo desde el emulador
 
 fun Route.getLastUpdatesDates(
-    photosController: PhotosController
+    photosController: PhotosController,
 ) {
     get("${PHOTO_BASE_ROUTE}/lastUpdatesDates") {
         call.respond(
@@ -71,9 +69,21 @@ fun Route.bestPhotos(
 ) {
     get("${PHOTO_BASE_ROUTE}/best") {
         val limit = (call.request.queryParameters["limit"])?.toInt() ?: BEST_PHOTO_LIMIT
+        val page = (call.request.queryParameters["page"])?.toInt() ?: 0
         call.respond(
             HttpStatusCode.OK,
-            photosController.getBestPhotos(limit)
+            photosController.getBestPhotos(limit, page)
+        )
+    }
+}
+
+fun Route.worstPhotos(
+    photosController: PhotosController,
+) {
+    get("${PHOTO_BASE_ROUTE}/worst") {
+        call.respond(
+            HttpStatusCode.OK,
+            photosController.getWorstPhotos()
         )
     }
 }
@@ -182,7 +192,18 @@ fun Route.newPhoto(photosController: PhotosController) {
 
 fun Route.updatePhoto(photosController: PhotosController) {
     post("${PHOTO_BASE_ROUTE}/update") {
-        if (photosController.updatePhoto(call.receive())) {
+        val full = (call.request.queryParameters["full"])?.toInt() ?: 0
+        if (full == 1) {
+            if (photosController.fullUpdatePhoto(call.receive())) {
+                call.respond(
+                    HttpStatusCode.Accepted
+                )
+            } else {
+                call.respond(
+                    HttpStatusCode.NotImplemented
+                )
+            }
+        } else if (photosController.softUpdatePhoto(call.receive())) {
             call.respond(
                 HttpStatusCode.Accepted
             )
@@ -195,7 +216,7 @@ fun Route.updatePhoto(photosController: PhotosController) {
 }
 
 fun Route.resetRank(photosController: PhotosController) {
-    post("${PHOTO_BASE_ROUTE}/resetRank"){
+    post("${PHOTO_BASE_ROUTE}/resetRank") {
         if (call.request.queryParameters["postkey"] == POST_KEY) {
             if (photosController.resetRank()) {
                 call.respond(

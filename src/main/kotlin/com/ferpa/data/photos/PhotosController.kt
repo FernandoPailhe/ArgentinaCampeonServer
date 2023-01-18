@@ -2,6 +2,9 @@ package com.ferpa.data.photos
 
 import com.ferpa.data.model.*
 import com.ferpa.utils.Constants
+import com.ferpa.utils.Constants.NEW_VERSUS_DEFAULT_VALUE
+import com.ferpa.utils.Constants.NEW_VOTES_DEFAULT_VALUE
+import com.ferpa.utils.Constants.RANDOM_RANGE_DEFAULT_VALUE
 
 class PhotosController(
     private val dataSource: PhotoDataSource,
@@ -24,12 +27,16 @@ class PhotosController(
         return dataSource.getRankUpdates(getFrom)
     }
 
-    suspend fun resetRank(newVotes: Long = 50, newVersus: Long = 70, randomRange: Int = 10): Boolean {
+    suspend fun resetRank(newVotes: Int = NEW_VOTES_DEFAULT_VALUE, newVersus: Int = NEW_VERSUS_DEFAULT_VALUE, randomRange: Int = RANDOM_RANGE_DEFAULT_VALUE): Boolean {
         return dataSource.resetRank(newVotes, newVersus, randomRange)
     }
 
-    suspend fun getBestPhotos(limit: Int = Constants.BEST_PHOTO_LIMIT): List<Photo> {
-        return dataSource.getBestPhotos(limit)
+    suspend fun getBestPhotos(limit: Int = Constants.BEST_PHOTO_LIMIT, page: Int): List<Photo> {
+        return dataSource.getBestPhotos(limit, page)
+    }
+
+    suspend fun getWorstPhotos(): List<Photo> {
+        return dataSource.getWorstPhotos()
     }
 
     suspend fun getPhotosByPlayer(playerId: String): List<Photo> {
@@ -72,8 +79,12 @@ class PhotosController(
         return dataSource.deleteOneById(id)
     }
 
-    suspend fun updatePhoto(photo: Photo): Boolean {
-        return dataSource.updatePhotoAndKeepVotes(photo)
+    suspend fun softUpdatePhoto(photo: Photo): Boolean {
+        return dataSource.softUpdatePhoto(photo)
+    }
+
+    suspend fun fullUpdatePhoto(photo: Photo): Boolean {
+        return dataSource.fullUpdatePhoto(photo)
     }
 
     suspend fun updateAllMatchTitles(matchTitle: MatchTitle): Boolean {

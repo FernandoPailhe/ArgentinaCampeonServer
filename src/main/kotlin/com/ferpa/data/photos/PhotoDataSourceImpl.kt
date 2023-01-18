@@ -55,10 +55,10 @@ class PhotoDataSourceImpl(
         }
     }
 
-    override suspend fun resetRank(newVotes: Long, newVersus: Long, randomRange: Int): Boolean {
+     override suspend fun resetRank(newVotes: Int, newVersus: Int, randomRange: Int): Boolean {
         return try {
             collection.find().toList().forEach {
-                updateCompletePhoto(it.resetRank(
+                fullUpdatePhoto(it.resetRank(
                     newVotes = newVotes,
                     newVersus = newVersus,
                     randomRange = randomRange
@@ -70,8 +70,27 @@ class PhotoDataSourceImpl(
         }
     }
 
-    override suspend fun getBestPhotos(limit: Int): List<Photo> {
-        return collection.find().descendingSort(Photo::rank).limit(limit).toList()
+    override suspend fun getBestPhotos(limit: Int, page: Int): List<Photo> {
+        return if (page == 0) {
+            collection.find().descendingSort(Photo::rank).limit(limit).toList()
+        } else {
+            val list = collection.find().descendingSort(Photo::rank).toList()
+            val startIndex = page * limit
+            val endIndex = startIndex + limit
+            if (startIndex < list.size) {
+                if (endIndex < list.size) {
+                    list.subList(startIndex, endIndex)
+                } else {
+                    list.subList(startIndex, list.lastIndex)
+                }
+            } else {
+                emptyList()
+            }
+        }
+    }
+
+    override suspend fun getWorstPhotos(): List<Photo> {
+        return collection.find().ascendingSort(Photo::rank).toList()
     }
 
     override suspend fun getPhotosByPlayer(playerId: String): List<Photo> {
@@ -120,11 +139,11 @@ class PhotoDataSourceImpl(
         collection.insertOne(photo.newPhoto())
     }
 
-    override suspend fun updatePhotoAndKeepVotes(photo: Photo): Boolean {
+    override suspend fun softUpdatePhoto(photo: Photo): Boolean {
         return try {
             val oldPhoto = collection.findOne(Photo::id eq photo.id)
             if (oldPhoto != null) {
-                collection.updateOne(Photo::id eq photo.id, photo.updatePhoto(oldPhoto)).wasAcknowledged()
+                collection.updateOne(Photo::id eq photo.id, photo.softUpdatePhoto(oldPhoto)).wasAcknowledged()
                 true
             } else {
                 false
@@ -134,11 +153,11 @@ class PhotoDataSourceImpl(
         }
     }
 
-    override suspend fun updateCompletePhoto(photo: Photo): Boolean {
+    override suspend fun fullUpdatePhoto(photo: Photo): Boolean {
         return try {
             val oldPhoto = collection.findOne(Photo::id eq photo.id)
             if (oldPhoto != null) {
-                collection.updateOne(Photo::id eq photo.id, photo).wasAcknowledged()
+                collection.updateOne(Photo::id eq photo.id, photo.fullUpdate()).wasAcknowledged()
                 true
             } else {
                 false
@@ -168,7 +187,7 @@ class PhotoDataSourceImpl(
                 getPhotosByMatch(matchTitle.id).forEach { oldPhoto ->
                     if (oldPhoto.match != matchTitle) {
                         val newPhoto = oldPhoto.copy(match = matchTitle)
-                        updatePhotoAndKeepVotes(newPhoto.updatePhoto(oldPhoto))
+                        softUpdatePhoto(newPhoto.softUpdatePhoto(oldPhoto))
                     } else {
                         return true
                     }
@@ -186,7 +205,7 @@ class PhotoDataSourceImpl(
                 getPhotosByPhotographer(newTitle.id).forEach { oldPhoto ->
                     if (oldPhoto.photographer != newTitle) {
                         val newPhoto = oldPhoto.copy(photographer = newTitle)
-                        updatePhotoAndKeepVotes(newPhoto.updatePhoto(oldPhoto))
+                        softUpdatePhoto(newPhoto.softUpdatePhoto(oldPhoto))
                     } else {
                         return true
                     }
@@ -211,7 +230,7 @@ class PhotoDataSourceImpl(
                         }
                     }
                     val newPhoto = oldPhoto.copy(players = newPlayerTitleList)
-                    updatePhotoAndKeepVotes(newPhoto.updatePhoto(oldPhoto))
+                    softUpdatePhoto(newPhoto.softUpdatePhoto(oldPhoto))
                 }
                 true
             } else false
@@ -226,7 +245,7 @@ class PhotoDataSourceImpl(
                 getPhotosByMoment(newTitle.id).forEach { oldPhoto ->
                     if (oldPhoto.moment != newTitle) {
                         val newPhoto = oldPhoto.copy(moment = newTitle)
-                        updatePhotoAndKeepVotes(newPhoto.updatePhoto(oldPhoto))
+                        softUpdatePhoto(newPhoto.softUpdatePhoto(oldPhoto))
                     } else {
                         return true
                     }
@@ -250,7 +269,7 @@ class PhotoDataSourceImpl(
                     }
                 }
                 val newPhoto = oldPhoto.copy(tags = newTagList)
-                updatePhotoAndKeepVotes(newPhoto.updatePhoto(oldPhoto))
+                softUpdatePhoto(newPhoto.softUpdatePhoto(oldPhoto))
             }
             true
         } catch (e: Exception) {

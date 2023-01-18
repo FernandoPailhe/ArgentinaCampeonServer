@@ -1,5 +1,8 @@
 package com.ferpa.data.model
 
+import com.ferpa.utils.Constants.NEW_VERSUS_DEFAULT_VALUE
+import com.ferpa.utils.Constants.NEW_VOTES_DEFAULT_VALUE
+import com.ferpa.utils.Constants.RANDOM_RANGE_DEFAULT_VALUE
 import com.ferpa.utils.Constants.SUPER_VOTE_AMOUNT
 import com.ferpa.utils.divideToPercent
 import java.time.LocalDateTime
@@ -28,14 +31,21 @@ data class Photo(
     val rarity: Int? = 0
 )
 
-fun Photo.newPhoto(): Photo = this.copy(
-    id = UUID.randomUUID().toString(),
-    insertDate = LocalDateTime.now().toString(),
-    lastUpdate = LocalDateTime.now().toString(),
-    votesUpdate = LocalDateTime.now().toString()
-)
+fun Photo.newPhoto(): Photo {
+    val votes = NEW_VOTES_DEFAULT_VALUE + Random.nextInt(0, RANDOM_RANGE_DEFAULT_VALUE).toLong()
+    val versus = NEW_VERSUS_DEFAULT_VALUE + Random.nextInt(0, RANDOM_RANGE_DEFAULT_VALUE).toLong()
+    return this.copy(
+        id = UUID.randomUUID().toString(),
+        insertDate = LocalDateTime.now().toString(),
+        lastUpdate = LocalDateTime.now().toString(),
+        votesUpdate = LocalDateTime.now().toString(),
+        votes = votes,
+        versus = versus,
+        rank = votes.divideToPercent(versus)
+    )
+}
 
-fun Photo.updatePhoto(oldPhoto: Photo): Photo = this.copy(lastUpdate = LocalDateTime.now().toString(), votes = oldPhoto.votes, versus = oldPhoto.versus, rank = oldPhoto.rank, votesUpdate = oldPhoto.votesUpdate)
+fun Photo.softUpdatePhoto(oldPhoto: Photo): Photo = this.copy(lastUpdate = LocalDateTime.now().toString(), votes = oldPhoto.votes, versus = oldPhoto.versus, rank = oldPhoto.rank, votesUpdate = oldPhoto.votesUpdate)
 
 fun Photo.voteWin(superVote: Boolean = false): Photo {
     val votes = if (superVote) this.votes + SUPER_VOTE_AMOUNT else this.votes.inc()
@@ -52,15 +62,23 @@ fun Photo.voteLost(): Photo {
 
 fun Photo.toRankUpdate(): RankUpdate = RankUpdate(this.id, this.rank)
 
-fun Photo.resetRank(newVotes: Long = 50, newVersus: Long = 70, randomRange: Int = 10): Photo {
-    val votes = newVotes + Random.nextInt(0, randomRange)
-    val versus = newVersus + Random.nextInt(0, randomRange)
-    val rank = votes.divideToPercent(versus)
+fun Photo.resetRank(newVotes: Int = NEW_VOTES_DEFAULT_VALUE, newVersus: Int = NEW_VERSUS_DEFAULT_VALUE, randomRange: Int = RANDOM_RANGE_DEFAULT_VALUE): Photo {
+    val votes = newVotes + Random.nextInt(0, randomRange).toLong()
+    val versus = newVersus + Random.nextInt(0, randomRange).toLong()
     return this.copy(
         lastUpdate = LocalDateTime.now().toString(),
         votesUpdate = LocalDateTime.now().toString(),
         votes = votes,
         versus = versus,
-        rank = rank
+        rank = votes.divideToPercent(versus)
+    )
+}
+
+fun Photo.fullUpdate(): Photo {
+    return this.copy(
+        insertDate = LocalDateTime.now().toString(),
+        lastUpdate = LocalDateTime.now().toString(),
+        votesUpdate = LocalDateTime.now().toString(),
+        rank = this.votes.divideToPercent(this.versus)
     )
 }

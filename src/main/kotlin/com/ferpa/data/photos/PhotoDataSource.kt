@@ -1,6 +1,9 @@
 package com.ferpa.data.photos
 
 import com.ferpa.data.model.*
+import com.ferpa.utils.Constants.NEW_VERSUS_DEFAULT_VALUE
+import com.ferpa.utils.Constants.NEW_VOTES_DEFAULT_VALUE
+import com.ferpa.utils.Constants.RANDOM_RANGE_DEFAULT_VALUE
 
 interface PhotoDataSource {
 
@@ -12,9 +15,10 @@ interface PhotoDataSource {
 
     suspend fun getRankUpdates(getFrom: String?): List<RankUpdate>
 
-    suspend fun resetRank(newVotes: Long = 50, newVersus: Long = 70, randomRange: Int = 10): Boolean
+    suspend fun resetRank(newVotes: Int = NEW_VOTES_DEFAULT_VALUE, newVersus: Int = NEW_VERSUS_DEFAULT_VALUE, randomRange: Int = RANDOM_RANGE_DEFAULT_VALUE): Boolean
 
-    suspend fun getBestPhotos(limit: Int): List<Photo>
+    suspend fun getBestPhotos(limit: Int, page: Int): List<Photo>
+    suspend fun getWorstPhotos(): List<Photo>
 
     suspend fun getPhotosByPlayer(playerId: String): List<Photo>
 
@@ -34,9 +38,9 @@ interface PhotoDataSource {
 
     suspend fun insertPhoto(photo: Photo)
 
-    suspend fun updatePhotoAndKeepVotes(photo: Photo): Boolean
+    suspend fun softUpdatePhoto(photo: Photo): Boolean
 
-    suspend fun updateCompletePhoto(photo: Photo): Boolean
+    suspend fun fullUpdatePhoto(photo: Photo): Boolean
 
     suspend fun postVote(vote: Vote): Boolean
 

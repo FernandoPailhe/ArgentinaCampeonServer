@@ -29,6 +29,7 @@ fun Application.configureRouting() {
         updatePhotos(photosController)
         rankUpdates(photosController)
         bestPhotos(photosController)
+        worstPhotos(photosController)
         newPhoto(photosController)
         deletePhoto(photosController)
         postVote(photosController)
