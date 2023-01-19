@@ -21,14 +21,14 @@ data class Photo(
     val players: List<PlayerTitle?>? = emptyList(),
     val photographer: PhotographerTitle? = null,
     val tags: List<Tag?>? = emptyList(),
-    val votes: Long = 18,
-    val versus: Long = 20,
+    val votes: Long = NEW_VOTES_DEFAULT_VALUE.toLong(),
+    val versus: Long = NEW_VERSUS_DEFAULT_VALUE.toLong(),
     val rank: Double? = 0.66,
     val extra: String? = "",
     val description: String? = "",
     val photoType: String? = "",
     val moment: MomentTitle? = null,
-    val rarity: Int? = 0
+    val rarity: Int = 0,
 )
 
 fun Photo.newPhoto(): Photo {
@@ -45,7 +45,11 @@ fun Photo.newPhoto(): Photo {
     )
 }
 
-fun Photo.softUpdatePhoto(oldPhoto: Photo): Photo = this.copy(lastUpdate = LocalDateTime.now().toString(), votes = oldPhoto.votes, versus = oldPhoto.versus, rank = oldPhoto.rank, votesUpdate = oldPhoto.votesUpdate)
+fun Photo.softUpdatePhoto(oldPhoto: Photo): Photo = this.copy(lastUpdate = LocalDateTime.now().toString(),
+    votes = oldPhoto.votes,
+    versus = oldPhoto.versus,
+    rank = oldPhoto.rank,
+    votesUpdate = oldPhoto.votesUpdate)
 
 fun Photo.voteWin(superVote: Boolean = false): Photo {
     val votes = if (superVote) this.votes + SUPER_VOTE_AMOUNT else this.votes.inc()
@@ -62,7 +66,11 @@ fun Photo.voteLost(): Photo {
 
 fun Photo.toRankUpdate(): RankUpdate = RankUpdate(this.id, this.rank)
 
-fun Photo.resetRank(newVotes: Int = NEW_VOTES_DEFAULT_VALUE, newVersus: Int = NEW_VERSUS_DEFAULT_VALUE, randomRange: Int = RANDOM_RANGE_DEFAULT_VALUE): Photo {
+fun Photo.resetRank(
+    newVotes: Int = NEW_VOTES_DEFAULT_VALUE,
+    newVersus: Int = NEW_VERSUS_DEFAULT_VALUE,
+    randomRange: Int = RANDOM_RANGE_DEFAULT_VALUE,
+): Photo {
     val votes = newVotes + Random.nextInt(0, randomRange).toLong()
     val versus = newVersus + Random.nextInt(0, randomRange).toLong()
     return this.copy(
@@ -80,5 +88,14 @@ fun Photo.fullUpdate(): Photo {
         lastUpdate = LocalDateTime.now().toString(),
         votesUpdate = LocalDateTime.now().toString(),
         rank = this.votes.divideToPercent(this.versus)
+    )
+}
+
+fun Photo.updateState(rarity: Int): Photo {
+    return this.copy(
+        insertDate = LocalDateTime.now().toString(),
+        lastUpdate = LocalDateTime.now().toString(),
+        votesUpdate = LocalDateTime.now().toString(),
+        rarity = rarity
     )
 }

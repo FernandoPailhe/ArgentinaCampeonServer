@@ -1,10 +1,10 @@
 package com.ferpa.data.photos
 
 import com.ferpa.data.model.*
-import com.ferpa.utils.Constants.DELETED_PHOTOS_VALUE
 import com.ferpa.utils.toRankUpdateList
 import org.litote.kmongo.*
 import org.litote.kmongo.coroutine.CoroutineDatabase
+import java.util.*
 
 class PhotoDataSourceImpl(
     private val db: CoroutineDatabase,
@@ -26,36 +26,36 @@ class PhotoDataSourceImpl(
 
     override suspend fun getPhotos(getFrom: String?): List<Photo> {
         return if (getFrom.isNullOrEmpty()) {
-            collection.find().filter(Photo::rarity gt DELETED_PHOTOS_VALUE).descendingSort(Photo::insertDate).toList()
+            collection.find(Photo::rarity gte PhotoState.HideState.rarity).descendingSort(Photo::insertDate).toList()
         } else {
             collection.find(Photo::insertDate gt getFrom)
                 .descendingSort(Photo::insertDate)
-                .toList()
+                .toList().filter { it.rarity >= PhotoState.HideState.rarity }
         }
     }
 
     override suspend fun getUpdatePhotos(getFrom: String?): List<Photo> {
         return if (getFrom.isNullOrEmpty()) {
-            collection.find().descendingSort(Photo::lastUpdate).toList()
+            collection.find(Photo::rarity gte PhotoState.HideState.rarity).descendingSort(Photo::lastUpdate).toList()
         } else {
             collection.find(Photo::lastUpdate gt getFrom)
                 .descendingSort(Photo::lastUpdate)
-                .toList()
+                .toList().filter { it.rarity >= PhotoState.HideState.rarity }
         }
     }
 
     override suspend fun getRankUpdates(getFrom: String?): List<RankUpdate> {
         return if (getFrom.isNullOrEmpty()) {
-            collection.find().descendingSort(Photo::votesUpdate).toList().toRankUpdateList()
+            collection.find(Photo::rarity gte PhotoState.HideState.rarity).descendingSort(Photo::votesUpdate).toList().toRankUpdateList()
         } else {
             collection.find(Photo::votesUpdate gt getFrom)
                 .descendingSort(Photo::votesUpdate)
-                .toList()
+                .toList().filter { it.rarity >= PhotoState.HideState.rarity }
                 .toRankUpdateList()
         }
     }
 
-     override suspend fun resetRank(newVotes: Int, newVersus: Int, randomRange: Int): Boolean {
+    override suspend fun resetRank(newVotes: Int, newVersus: Int, randomRange: Int): Boolean {
         return try {
             collection.find().toList().forEach {
                 fullUpdatePhoto(it.resetRank(
@@ -72,9 +72,9 @@ class PhotoDataSourceImpl(
 
     override suspend fun getBestPhotos(limit: Int, page: Int): List<Photo> {
         return if (page == 0) {
-            collection.find().descendingSort(Photo::rank).limit(limit).toList()
+            collection.find(Photo::rarity gte PhotoState.HideState.rarity).descendingSort(Photo::rank).limit(limit).toList()
         } else {
-            val list = collection.find().descendingSort(Photo::rank).toList()
+            val list = collection.find(Photo::rarity gte PhotoState.HideState.rarity).descendingSort(Photo::rank).toList()
             val startIndex = page * limit
             val endIndex = startIndex + limit
             if (startIndex < list.size) {
@@ -90,36 +90,42 @@ class PhotoDataSourceImpl(
     }
 
     override suspend fun getWorstPhotos(): List<Photo> {
-        return collection.find().ascendingSort(Photo::rank).toList()
+        return collection.find(Photo::rarity gte PhotoState.HideState.rarity).ascendingSort(Photo::rank).toList()
     }
 
     override suspend fun getPhotosByPlayer(playerId: String): List<Photo> {
-        return collection.find(Photo::players / PlayerTitle::id eq playerId)
+        return collection.find().filter(Photo::players / PlayerTitle::id eq playerId)
             .descendingSort(Photo::rank)
-            .toList()
+            .toList().filter { it.rarity >= PhotoState.HideState.rarity }
     }
 
     override suspend fun getPhotosByMatch(matchId: String): List<Photo> {
         return collection.find(Photo::match / MatchTitle::id eq matchId)
             .descendingSort(Photo::rank)
-            .toList()
+            .toList().filter { it.rarity >= PhotoState.HideState.rarity }
     }
 
     override suspend fun getPhotosByTag(tagId: String): List<Photo> {
         return collection.find(Photo::tags / Tag::id eq tagId)
             .descendingSort(Photo::rank)
-            .toList()
+            .toList().filter { it.rarity >= PhotoState.HideState.rarity }
     }
 
     override suspend fun getPhotosByPhotographer(photographerId: String): List<Photo> {
         return collection.find(Photo::photographer / PhotographerTitle::id eq photographerId)
             .descendingSort(Photo::rank)
-            .toList()
+            .toList().filter { it.rarity >= PhotoState.HideState.rarity }
     }
 
     override suspend fun getPhotosByMoment(momentId: String): List<Photo> {
         return collection.find(Photo::moment / MomentTitle::id eq momentId)
             .descendingSort(Photo::rank)
+            .toList().filter { it.rarity >= PhotoState.HideState.rarity }
+    }
+
+    override suspend fun getPhotosByState(rarity: Int): List<Photo> {
+        return collection.find(Photo::rarity eq rarity)
+            .descendingSort(Photo::insertDate)
             .toList()
     }
 
@@ -137,6 +143,22 @@ class PhotoDataSourceImpl(
 
     override suspend fun insertPhoto(photo: Photo) {
         collection.insertOne(photo.newPhoto())
+    }
+
+    override suspend fun massiveAdd(photoUrlList: List<String>): Boolean {
+        return try{
+            photoUrlList.forEach {
+                val photo = Photo(
+                    id = UUID.randomUUID().toString(),
+                    photoUrl = it,
+                    rarity = PhotoState.IncompleteState.rarity
+                )
+                collection.insertOne(photo)
+            }
+            true
+        } catch (e: java.lang.Exception) {
+            false
+        }
     }
 
     override suspend fun softUpdatePhoto(photo: Photo): Boolean {
@@ -272,6 +294,20 @@ class PhotoDataSourceImpl(
                 softUpdatePhoto(newPhoto.softUpdatePhoto(oldPhoto))
             }
             true
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    override suspend fun updateState(photoId: String, rarity: Int): Boolean {
+        return try {
+            val photo = collection.findOne(Photo::id eq photoId)
+            if (photo != null) {
+                collection.updateOne(Photo::id eq photoId, photo.updateState(rarity)).wasAcknowledged()
+                true
+            } else {
+                false
+            }
         } catch (e: Exception) {
             false
         }

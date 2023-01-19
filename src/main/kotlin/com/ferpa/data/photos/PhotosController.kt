@@ -27,7 +27,7 @@ class PhotosController(
         return dataSource.getRankUpdates(getFrom)
     }
 
-    suspend fun resetRank(newVotes: Int = NEW_VOTES_DEFAULT_VALUE, newVersus: Int = NEW_VERSUS_DEFAULT_VALUE, randomRange: Int = RANDOM_RANGE_DEFAULT_VALUE): Boolean {
+    suspend fun resetRank(newVotes: Int, newVersus: Int, randomRange: Int): Boolean {
         return dataSource.resetRank(newVotes, newVersus, randomRange)
     }
 
@@ -59,6 +59,10 @@ class PhotosController(
         return dataSource.getPhotosByMoment(momentId)
     }
 
+    suspend fun getPhotosByState(rarity: Int): List<Photo> {
+        return dataSource.getPhotosByState(rarity)
+    }
+
     suspend fun getPhotosByCustomQuery(customQuery: CustomQuery): List<Photo> {
         return dataSource.getPhotosByCustomQuery(customQuery)
     }
@@ -69,6 +73,10 @@ class PhotosController(
 
     suspend fun insertPhoto(photo: Photo) {
         dataSource.insertPhoto(photo)
+    }
+
+    suspend fun massiveAdd(photoUrlList: List<String>): Boolean{
+        return dataSource.massiveAdd(photoUrlList)
     }
 
     suspend fun postVote(vote: Vote): Boolean {
@@ -105,6 +113,10 @@ class PhotosController(
 
     suspend fun updateAllTags(tag: Tag): Boolean {
         return dataSource.updateAllTag(tag)
+    }
+
+    suspend fun updateState(photoId:String, rarity: Int): Boolean{
+        return dataSource.updateState(photoId, rarity)
     }
 
 }

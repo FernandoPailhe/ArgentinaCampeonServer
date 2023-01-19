@@ -2,7 +2,9 @@ package com.ferpa.routes
 
 
 import com.ferpa.data.model.CustomQuery
+import com.ferpa.data.model.PhotoState
 import com.ferpa.data.photos.PhotosController
+import com.ferpa.utils.Constants
 import com.ferpa.utils.Constants.BEST_PHOTO_LIMIT
 import com.ferpa.utils.Constants.DELETE_KEY
 import com.ferpa.utils.Constants.MATCH_BASE_ROUTE
@@ -148,6 +150,18 @@ fun Route.photosByMoment(
     }
 }
 
+fun Route.photosByState(
+    photosController: PhotosController,
+) {
+    get("$PHOTO_BASE_ROUTE/state") {
+        val rarity = call.request.queryParameters["rarity"]?.toInt() ?: PhotoState.HideState.rarity
+        call.respond(
+            HttpStatusCode.OK,
+            photosController.getPhotosByState(rarity)
+        )
+    }
+}
+
 fun Route.photosByCustomQuery(
     photosController: PhotosController,
 ) {
@@ -190,6 +204,21 @@ fun Route.newPhoto(photosController: PhotosController) {
     }
 }
 
+fun Route.massiveAdd(photosController: PhotosController) {
+    post("${PHOTO_BASE_ROUTE}/massiveAdd") {
+        if (photosController.massiveAdd(call.receive())) {
+            call.respond(
+                HttpStatusCode.Accepted
+            )
+        } else {
+            call.respond(
+                HttpStatusCode.NotImplemented
+            )
+        }
+
+    }
+}
+
 fun Route.updatePhoto(photosController: PhotosController) {
     post("${PHOTO_BASE_ROUTE}/update") {
         val full = (call.request.queryParameters["full"])?.toInt() ?: 0
@@ -218,7 +247,32 @@ fun Route.updatePhoto(photosController: PhotosController) {
 fun Route.resetRank(photosController: PhotosController) {
     post("${PHOTO_BASE_ROUTE}/resetRank") {
         if (call.request.queryParameters["postkey"] == POST_KEY) {
-            if (photosController.resetRank()) {
+            val votes = call.parameters["votes"]?.toInt() ?: Constants.NEW_VOTES_DEFAULT_VALUE
+            val versus = call.parameters["versus"]?.toInt() ?: Constants.NEW_VERSUS_DEFAULT_VALUE
+            val random = call.parameters["random"]?.toInt() ?: Constants.RANDOM_RANGE_DEFAULT_VALUE
+            if (photosController.resetRank(votes, versus, random)) {
+                call.respond(
+                    HttpStatusCode.Accepted
+                )
+            } else {
+                call.respond(
+                    HttpStatusCode.NotImplemented
+                )
+            }
+        } else {
+            call.respond(
+                HttpStatusCode.Unauthorized
+            )
+        }
+    }
+}
+
+fun Route.updateState(photosController: PhotosController) {
+    post("${PHOTO_BASE_ROUTE}/state/{id}") {
+        if (call.request.queryParameters["postkey"] == POST_KEY) {
+            val id = call.parameters["id"] ?: ""
+            val rarity = call.parameters["rarity"]?.toInt() ?: PhotoState.AvailableState.rarity
+            if (photosController.updateState(id, rarity)) {
                 call.respond(
                     HttpStatusCode.Accepted
                 )

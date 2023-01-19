@@ -30,6 +30,8 @@ interface PhotoDataSource {
 
     suspend fun getPhotosByMoment(momentId: String): List<Photo>
 
+    suspend fun getPhotosByState(rarity: Int): List<Photo>
+
     suspend fun getPhotosByCustomQuery(customQuery: CustomQuery): List<Photo>
 
     suspend fun getPhotoById(photoId: String): Photo?
@@ -37,6 +39,8 @@ interface PhotoDataSource {
     suspend fun deleteOneById(id: String): Boolean
 
     suspend fun insertPhoto(photo: Photo)
+
+    suspend fun massiveAdd(photoUrlList: List<String>): Boolean
 
     suspend fun softUpdatePhoto(photo: Photo): Boolean
 
@@ -54,4 +58,5 @@ interface PhotoDataSource {
 
     suspend fun updateAllTag(tag: Tag): Boolean
 
+    suspend fun updateState(photoId: String, rarity: Int): Boolean
 }

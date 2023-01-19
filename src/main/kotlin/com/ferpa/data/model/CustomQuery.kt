@@ -18,27 +18,27 @@ suspend fun CustomQuery.filter(collection: CoroutineCollection<Photo>): List<Pho
     val filterPlayer = collection.find()
         .takeUnless { this.playerId.isNullOrEmpty() }
         .let { it?.filter(Photo::players / PlayerTitle::id eq this.playerId) }
-        ?.toList()
+        ?.toList()?.filter { it.rarity >= PhotoState.HideState.rarity }
 
     val filterMatch = collection.find()
         .takeUnless { this.matchId.isNullOrEmpty() }
         .let { it?.filter(Photo::match / MatchTitle::id eq this.matchId) }
-        ?.toList()
+        ?.toList()?.filter { it.rarity >= PhotoState.HideState.rarity }
 
     val filterTag = collection.find()
         .takeUnless { this.tagId.isNullOrEmpty() }
         .let { it?.filter(Photo::tags / Tag::id eq this.tagId) }
-        ?.toList()
+        ?.toList()?.filter { it.rarity >= PhotoState.HideState.rarity }
 
     val filterPhotographer = collection.find()
         .takeUnless { this.photographerId.isNullOrEmpty() }
         .let { it?.filter(Photo::photographer / PhotographerTitle::id eq this.photographerId) }
-        ?.toList()
+        ?.toList()?.filter { it.rarity >= PhotoState.HideState.rarity }
 
     val filterMoment = collection.find()
         .takeUnless { this.momentId.isNullOrEmpty() }
         .let { it?.filter(Photo::moment / MomentTitle::id eq this.momentId) }
-        ?.toList()
+        ?.toList()?.filter { it.rarity >= PhotoState.HideState.rarity }
 
     val filteredLists = listOf(
         filterPlayer, filterMatch, filterTag, filterPhotographer, filterMoment
