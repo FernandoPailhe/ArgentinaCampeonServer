@@ -95,9 +95,10 @@ fun Route.photosByPlayer(
 ) {
     get("${PHOTO_BASE_ROUTE}${PLAYER_BASE_ROUTE}/{playerId}") {
         val playerId = call.parameters["playerId"] ?: ""
+        val best = (call.request.queryParameters["best"])?.toInt() ?: 0
         call.respond(
             HttpStatusCode.OK,
-            photosController.getPhotosByPlayer(playerId)
+            photosController.getPhotosByPlayer(playerId, best)
         )
     }
 }

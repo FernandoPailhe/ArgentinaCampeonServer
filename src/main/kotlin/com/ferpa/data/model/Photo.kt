@@ -82,13 +82,21 @@ fun Photo.resetRank(
     )
 }
 
-fun Photo.fullUpdate(): Photo {
-    return this.copy(
-        insertDate = LocalDateTime.now().toString(),
-        lastUpdate = LocalDateTime.now().toString(),
-        votesUpdate = LocalDateTime.now().toString(),
-        rank = this.votes.divideToPercent(this.versus)
-    )
+fun Photo.fullUpdate(keeInsertDate: Boolean = false): Photo {
+    return if (keeInsertDate) {
+        this.copy(
+            lastUpdate = LocalDateTime.now().toString(),
+            votesUpdate = LocalDateTime.now().toString(),
+            rank = this.votes.divideToPercent(this.versus)
+        )
+    } else {
+        this.copy(
+            insertDate = LocalDateTime.now().toString(),
+            lastUpdate = LocalDateTime.now().toString(),
+            votesUpdate = LocalDateTime.now().toString(),
+            rank = this.votes.divideToPercent(this.versus)
+        )
+    }
 }
 
 fun Photo.updateState(rarity: Int): Photo {
@@ -97,5 +105,13 @@ fun Photo.updateState(rarity: Int): Photo {
         lastUpdate = LocalDateTime.now().toString(),
         votesUpdate = LocalDateTime.now().toString(),
         rarity = rarity
+    )
+}
+
+fun Photo.toBestPhoto(photoCount: Int): Photo {
+    return Photo(
+        id = this.id,
+        photoUrl = this.photoUrl,
+        versus = photoCount.toLong()
     )
 }

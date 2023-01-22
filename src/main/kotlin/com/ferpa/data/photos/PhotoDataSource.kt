@@ -20,7 +20,7 @@ interface PhotoDataSource {
     suspend fun getBestPhotos(limit: Int, page: Int): List<Photo>
     suspend fun getWorstPhotos(): List<Photo>
 
-    suspend fun getPhotosByPlayer(playerId: String): List<Photo>
+    suspend fun getPhotosByPlayer(playerId: String, best: Int = 0): List<Photo>
 
     suspend fun getPhotosByMatch(matchId: String): List<Photo>
 
@@ -44,7 +44,7 @@ interface PhotoDataSource {
 
     suspend fun softUpdatePhoto(photo: Photo): Boolean
 
-    suspend fun fullUpdatePhoto(photo: Photo): Boolean
+    suspend fun fullUpdatePhoto(photo: Photo, keepInsertDate: Boolean = false): Boolean
 
     suspend fun postVote(vote: Vote): Boolean
 

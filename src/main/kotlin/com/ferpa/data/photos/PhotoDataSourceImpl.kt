@@ -26,11 +26,11 @@ class PhotoDataSourceImpl(
 
     override suspend fun getPhotos(getFrom: String?): List<Photo> {
         return if (getFrom.isNullOrEmpty()) {
-            collection.find(Photo::rarity gte PhotoState.HideState.rarity).descendingSort(Photo::insertDate).toList()
+            collection.find().descendingSort(Photo::insertDate).toList()
         } else {
             collection.find(Photo::insertDate gt getFrom)
                 .descendingSort(Photo::insertDate)
-                .toList().filter { it.rarity >= PhotoState.HideState.rarity }
+                .toList()
         }
     }
 
@@ -46,7 +46,8 @@ class PhotoDataSourceImpl(
 
     override suspend fun getRankUpdates(getFrom: String?): List<RankUpdate> {
         return if (getFrom.isNullOrEmpty()) {
-            collection.find(Photo::rarity gte PhotoState.HideState.rarity).descendingSort(Photo::votesUpdate).toList().toRankUpdateList()
+            collection.find(Photo::rarity gte PhotoState.HideState.rarity).descendingSort(Photo::votesUpdate).toList()
+                .toRankUpdateList()
         } else {
             collection.find(Photo::votesUpdate gt getFrom)
                 .descendingSort(Photo::votesUpdate)
@@ -62,19 +63,21 @@ class PhotoDataSourceImpl(
                     newVotes = newVotes,
                     newVersus = newVersus,
                     randomRange = randomRange
-                ))
+                ), keepInsertDate = true)
             }
             true
-        } catch (e: java.lang.Exception){
+        } catch (e: java.lang.Exception) {
             false
         }
     }
 
     override suspend fun getBestPhotos(limit: Int, page: Int): List<Photo> {
         return if (page == 0) {
-            collection.find(Photo::rarity gte PhotoState.HideState.rarity).descendingSort(Photo::rank).limit(limit).toList()
+            collection.find(Photo::rarity gte PhotoState.HideState.rarity).descendingSort(Photo::rank).limit(limit)
+                .toList()
         } else {
-            val list = collection.find(Photo::rarity gte PhotoState.HideState.rarity).descendingSort(Photo::rank).toList()
+            val list =
+                collection.find(Photo::rarity gte PhotoState.HideState.rarity).descendingSort(Photo::rank).toList()
             val startIndex = page * limit
             val endIndex = startIndex + limit
             if (startIndex < list.size) {
@@ -93,10 +96,22 @@ class PhotoDataSourceImpl(
         return collection.find(Photo::rarity gte PhotoState.HideState.rarity).ascendingSort(Photo::rank).toList()
     }
 
-    override suspend fun getPhotosByPlayer(playerId: String): List<Photo> {
-        return collection.find().filter(Photo::players / PlayerTitle::id eq playerId)
-            .descendingSort(Photo::rank)
-            .toList().filter { it.rarity >= PhotoState.HideState.rarity }
+    override suspend fun getPhotosByPlayer(playerId: String, best: Int): List<Photo> {
+        return if (best == 1) {
+            val allPhotos = collection.find().filter(Photo::players / PlayerTitle::id eq playerId)
+                .descendingSort(Photo::rank)
+                .toList().filter { it.rarity >= PhotoState.HideState.rarity }
+            return if(allPhotos.isNotEmpty()) {
+                allPhotos.subList(0,1).map { it.toBestPhoto(allPhotos.size) }
+            } else {
+                emptyList()
+            }
+
+        } else {
+            collection.find().filter(Photo::players / PlayerTitle::id eq playerId)
+                .descendingSort(Photo::rank)
+                .toList().filter { it.rarity >= PhotoState.HideState.rarity }
+        }
     }
 
     override suspend fun getPhotosByMatch(matchId: String): List<Photo> {
@@ -146,7 +161,7 @@ class PhotoDataSourceImpl(
     }
 
     override suspend fun massiveAdd(photoUrlList: List<String>): Boolean {
-        return try{
+        return try {
             photoUrlList.forEach {
                 val photo = Photo(
                     id = UUID.randomUUID().toString(),
@@ -175,11 +190,11 @@ class PhotoDataSourceImpl(
         }
     }
 
-    override suspend fun fullUpdatePhoto(photo: Photo): Boolean {
+    override suspend fun fullUpdatePhoto(photo: Photo, keepInsertDate: Boolean): Boolean {
         return try {
             val oldPhoto = collection.findOne(Photo::id eq photo.id)
             if (oldPhoto != null) {
-                collection.updateOne(Photo::id eq photo.id, photo.fullUpdate()).wasAcknowledged()
+                collection.updateOne(Photo::id eq photo.id, photo.fullUpdate(keepInsertDate)).wasAcknowledged()
                 true
             } else {
                 false

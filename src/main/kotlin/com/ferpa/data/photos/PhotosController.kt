@@ -39,8 +39,8 @@ class PhotosController(
         return dataSource.getWorstPhotos()
     }
 
-    suspend fun getPhotosByPlayer(playerId: String): List<Photo> {
-        return dataSource.getPhotosByPlayer(playerId)
+    suspend fun getPhotosByPlayer(playerId: String, best: Int): List<Photo> {
+        return dataSource.getPhotosByPlayer(playerId, best)
     }
 
     suspend fun getPhotosByMatch(matchId: String): List<Photo> {
