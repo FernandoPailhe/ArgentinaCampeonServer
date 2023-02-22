@@ -18,6 +18,7 @@ The backend service follows a three-layered architecture consisting of:
 * __Controller Layer:__ This layer implements the business logic for the API. It uses an ORM layer to interact with the database.
 
 * __ORM Layer:__ This layer contains an interface class and an implementation class for each table. It handles the interaction with the database.
+
 Each table in the database has its own set of routes, controller, and ORM classes.
 
 ### Endpoints
