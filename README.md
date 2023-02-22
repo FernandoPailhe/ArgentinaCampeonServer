@@ -10,7 +10,7 @@ The database used in this project is MongoDB, which has six tables.
 ### Dependency Injection
 The backend service uses dependency injection to manage dependencies between the layers.
 
-## Architecture
+### Architecture
 The backend service follows a three-layered architecture consisting of:
 
 * Routes Layer: This layer handles incoming requests and maps them to the appropriate controller function.
@@ -19,9 +19,6 @@ The backend service follows a three-layered architecture consisting of:
 
 * ORM Layer: This layer contains an interface class and an implementation class for each table. It handles the interaction with the database.
 Each table in the database has its own set of routes, controller, and ORM classes.
-
-Implementation
-One of the implementations has functions that create a mapped list by pulling data from several tables.
 
 ### Endpoints
 There are several endpoints in the backend service, including endpoints for both regular users and admin users. 
