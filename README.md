@@ -1,6 +1,6 @@
 # ArgentinaCampeonServer
 
-Backend service built using MongoDB as the database and a three-layered architecture, which serves the 'Argentina Campeon del Mundo' Android application.
+Backend service built using Ktor and MongoDB as the database and a three-layered architecture, which serves the 'Argentina Campeon del Mundo' Android application.
 
 __Android app:__ https://play.google.com/store/apps/details?id=com.ferpa.argentinacampeon
 
